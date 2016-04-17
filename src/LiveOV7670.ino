@@ -19,7 +19,7 @@ C (analog input pins)
 D (digital pins 0 to 7)
 */
 #define VSYNC_PORTD 0b00000100 // PIN 2
-//#define HREF_PORTC 0b10000000 // PIN A7
+//#define HREF_PORTC 0b10000000 // PIN A7 - doesn't work!
 #define PCLOCK_PORTB 0b00010000 // PIN 12
 #define LOW_4_BITS_PORTC 0b00001111 // PIN A0..A3
 #define HIGH_4_BITS_PORTD 0b11110000 // PIN 4..7
