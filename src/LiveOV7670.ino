@@ -88,7 +88,8 @@ inline void waitForRisingPixelClock(void) __attribute__((always_inline));
 inline uint8_t getPixelByte(void) __attribute__((always_inline));
 inline void nextScreenLineStart(void) __attribute__((always_inline));
 inline void screenLineEnd(void) __attribute__((always_inline));
-
+inline void sendPixelByte(uint8_t byte) __attribute__((always_inline));
+inline void waitUntilPreviousPixelSent(void) __attribute__((always_inline));
 
 
 
@@ -114,19 +115,23 @@ void processFrame() {
     waitForRisingPixelClock();
     pixel_low = getPixelByte();
 
-    if (isPixelVisible) {
-      SPDR = pixel_high;
+    if (isPixelVisible && pixelColIndex > 0) {
+      sendPixelByte(pixel_low);
     }
 
     waitForRisingPixelClock();
     pixel_high = getPixelByte();
 
     if (isPixelVisible) {
-      SPDR = pixel_low;
+      sendPixelByte(pixel_high);
     }
     
     pixelColIndex++;
     if (pixelColIndex == cameraPixelColCount) {
+
+      waitUntilPreviousPixelSent();
+      sendPixelByte(pixel_low);
+
       pixelColIndex = 0;
       pixelRowIndex++;
 
@@ -175,6 +180,21 @@ void screenLineEnd()   {
 }
 
 
+void sendPixelByte(uint8_t byte) {
+  SPDR = byte;
+}
+
+void waitUntilPreviousPixelSent() {
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+}
 
 
 

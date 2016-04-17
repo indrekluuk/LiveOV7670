@@ -20,13 +20,6 @@ void OV7670Initializer::setUpCamera() {
   setRegisters(regsRGB565);
   setRegisters(regsQQVGA);
   setRegisters(regsClock);
-
-
-  /*
-   * https://github.com/ComputerNerd/ov7670-no-ram-arduino-uno/blob/master/ov7670.h
-   * according to the Linux kernel driver rgb565 PCLK needs rewriting
-   */
-  rewriteRegister(REG_CLKRC);
 }
 
 
@@ -72,10 +65,9 @@ uint8_t OV7670Initializer::readRegister(uint8_t addr) {
 }
 
 
-void OV7670Initializer::rewriteRegister(uint8_t addr) {
+void OV7670Initializer::addBitsToRegister(uint8_t addr, uint8_t bits) {
   uint8_t val = readRegister(addr);
-  delay(1);
-  setRegister(addr, val);
+  setRegister(addr, val | bits);
 }
 
 

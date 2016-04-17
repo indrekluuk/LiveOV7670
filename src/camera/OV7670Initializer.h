@@ -34,7 +34,7 @@ private:
   void setRegisters(const RegisterData *registerData);
   void setRegister(uint8_t addr, uint8_t val);
   uint8_t readRegister(uint8_t addr);
-  void rewriteRegister(uint8_t addr);
+  void addBitsToRegister(uint8_t addr, uint8_t bits);
 
 };
 
