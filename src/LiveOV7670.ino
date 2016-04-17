@@ -1,6 +1,5 @@
 
 #include "screen/Adafruit_ST7735_mod.h"
-#include <SPI.h>
 #include "camera/OV7670Initializer.h"
 
 
