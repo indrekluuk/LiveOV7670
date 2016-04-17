@@ -8,3 +8,10 @@ Compiling in Arduino IDE:
 3. rename "src" folder to "LiveOV7670"
 4. open "LiveOV7670.ino" in Arduino IDE
 
+
+
+
+
+Special thanks to
+https://github.com/ComputerNerd/ov7670-no-ram-arduino-uno
+
