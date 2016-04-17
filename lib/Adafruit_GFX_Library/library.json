@@ -1,0 +1,13 @@
+{
+  "name": "Adafruit-GFX",
+  "keywords": "display, tft, graphics",
+  "description": "A core graphics library for all our displays, providing a common set of graphics primitives (points, lines, circles, etc.)",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/adafruit/Adafruit-GFX-Library.git"
+  },
+  "exclude": "fontconvert",
+  "frameworks": "arduino",
+  "platforms": "atmelavr"
+}
