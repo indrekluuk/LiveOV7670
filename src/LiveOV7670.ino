@@ -75,12 +75,6 @@ void loop() {
 
 
 
-int screen_w = ST7735_TFTWIDTH;
-int screen_h = ST7735_TFTHEIGHT_18;
-int cameraPixelColCount = 160;
-int cameraPixelRowCount = 120;
-int scanLine;
-
 
 
 inline void waitForVsync(void) __attribute__((always_inline));
@@ -89,7 +83,14 @@ inline uint8_t getPixelByte(void) __attribute__((always_inline));
 inline void nextScreenLineStart(void) __attribute__((always_inline));
 inline void screenLineEnd(void) __attribute__((always_inline));
 inline void sendPixelByte(uint8_t byte) __attribute__((always_inline));
-inline void waitUntilPreviousPixelSent(void) __attribute__((always_inline));
+
+
+
+int screen_w = ST7735_TFTWIDTH;
+int screen_h = ST7735_TFTHEIGHT_18;
+int cameraPixelColCount = 160;
+int cameraPixelRowCount = 120;
+int scanLine;
 
 
 
@@ -103,45 +104,44 @@ void processFrame() {
 
 
   scanLine = screen_w;
-  nextScreenLineStart();
+
 
   uint8_t pixel_high = 0;
   uint8_t pixel_low = 0;
 
-  while (true) {
-    bool isPixelVisible = (pixelColIndex < screen_h);
 
-    waitForRisingPixelClock();
-    pixel_low = getPixelByte();
-
-    if (isPixelVisible) {
-      sendPixelByte(pixel_high);
-    }
-
-    waitForRisingPixelClock();
-    pixel_high = getPixelByte();
-
-    if (isPixelVisible) {
-      sendPixelByte(pixel_low);
-    }
-
-    pixelColIndex++;
-    if (pixelColIndex == cameraPixelColCount) {
+  while (pixelRowIndex < cameraPixelRowCount) {
+    nextScreenLineStart();
 
 
-      pixelColIndex = 0;
-      pixelRowIndex++;
+    while(pixelColIndex < cameraPixelColCount) {
+      if (pixelColIndex < screen_h) {
 
-      screenLineEnd();
-      nextScreenLineStart();
+        waitForRisingPixelClock();
+        pixel_low = getPixelByte();
 
-      if (pixelRowIndex == cameraPixelRowCount) {
-        break;
+        sendPixelByte(pixel_high);
+
+        waitForRisingPixelClock();
+        pixel_high = getPixelByte();
+
+        sendPixelByte(pixel_low);
+
+      } else {
+        // count off-screen pixel
+        waitForRisingPixelClock();
+        waitForRisingPixelClock();
       }
+
+      pixelColIndex++;
     }
+
+    pixelColIndex = 0;
+    pixelRowIndex++;
+    screenLineEnd();
   }
 
-  screenLineEnd();
+
 }
 
 
@@ -180,19 +180,6 @@ void screenLineEnd()   {
 void sendPixelByte(uint8_t byte) {
   SPDR = byte;
 }
-
-void waitUntilPreviousPixelSent() {
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-}
-
 
 
 
