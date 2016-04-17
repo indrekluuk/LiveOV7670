@@ -44,7 +44,7 @@ void setUpCamera() {
 
 void setUpScreen() {
   tft.initR(INITR_BLACKTAB);   // initialize a ST7735S chip, black tab
-  tft.fillScreen(ST7735_BLACK);
+  tft.fillScreen(ST7735_RED);
 }
 
 
@@ -108,29 +108,26 @@ void processFrame() {
   uint8_t pixel_high = 0;
   uint8_t pixel_low = 0;
 
-
   while (true) {
     bool isPixelVisible = (pixelColIndex < screen_h);
 
     waitForRisingPixelClock();
     pixel_low = getPixelByte();
 
-    if (isPixelVisible && pixelColIndex > 0) {
-      sendPixelByte(pixel_low);
+    if (isPixelVisible) {
+      sendPixelByte(pixel_high);
     }
 
     waitForRisingPixelClock();
     pixel_high = getPixelByte();
 
     if (isPixelVisible) {
-      sendPixelByte(pixel_high);
+      sendPixelByte(pixel_low);
     }
-    
+
     pixelColIndex++;
     if (pixelColIndex == cameraPixelColCount) {
 
-      waitUntilPreviousPixelSent();
-      sendPixelByte(pixel_low);
 
       pixelColIndex = 0;
       pixelRowIndex++;
