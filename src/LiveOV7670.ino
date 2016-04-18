@@ -44,7 +44,7 @@ void setUpCamera() {
 
 void setUpScreen() {
   tft.initR(INITR_BLACKTAB);   // initialize a ST7735S chip, black tab
-  tft.fillScreen(ST7735_RED);
+  tft.fillScreen(ST7735_BLACK);
 }
 
 
