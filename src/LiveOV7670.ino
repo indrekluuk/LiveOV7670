@@ -44,7 +44,7 @@ void setUpCamera() {
 
 void setUpScreen() {
   tft.initR(INITR_BLACKTAB);   // initialize a ST7735S chip, black tab
-  tft.fillScreen(ST7735_RED);
+  tft.fillScreen(ST7735_BLACK);
 }
 
 
@@ -78,11 +78,14 @@ void loop() {
 
 
 inline void waitForVsync(void) __attribute__((always_inline));
-inline void waitForRisingPixelClock(void) __attribute__((always_inline));
 
-inline void readPixel_x160(uint16_t byteIndex) __attribute__((always_inline));
-inline void readPixel_x10(uint16_t byteIndex) __attribute__((always_inline));
-inline void readPixel(uint16_t byteIndex) __attribute__((always_inline));
+inline void readPixels_unrolled_x160(uint16_t byteIndex) __attribute__((always_inline));
+inline void readPixels_unrolled_x10(uint16_t byteIndex) __attribute__((always_inline));
+inline void readPixel_unrolled(uint16_t byteIndex) __attribute__((always_inline));
+inline void readPixels_loop_line() __attribute__((always_inline));
+
+inline void waitForPixelClockLow(void) __attribute__((always_inline));
+inline void waitForPixelClockRisingEdge(void) __attribute__((always_inline));
 inline uint8_t getPixelByte(void) __attribute__((always_inline));
 
 inline void sendLineBufferToDisplay() __attribute__((always_inline));
@@ -112,7 +115,19 @@ void processFrame() {
 
   while (pixelRowIndex < cameraPixelRowCount) {
 
-    readPixel_x160(0);
+    waitForPixelClockLow();
+
+    // 2.5 FPS or less:
+    //readPixels_loop_line();
+
+    // 5 FPS
+    //#define PIXEL_CLOCK_WAITING 1
+    //readPixels_loop_line();
+
+    // 10 FPS
+    #define PIXEL_CLOCK_WAITING 2
+    readPixels_unrolled_x160(0);
+
 
     sendLineBufferToDisplay();
     pixelRowIndex++;
@@ -132,52 +147,83 @@ void waitForVsync()   {
 }
 
 
-void waitForRisingPixelClock() {
-  while(PINB & PCLOCK_PORTB);
-  while(!(PINB & PCLOCK_PORTB));
-}
-
-
 #define READ_PIXEL_X160_STEP 20
-void readPixel_x160(uint16_t byteIndex) {
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 0);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 1);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 2);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 3);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 4);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 5);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 6);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 7);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 8);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 9);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 10);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 11);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 12);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 13);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 14);
-  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 15);
+void readPixels_unrolled_x160(uint16_t byteIndex) {
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 0);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 1);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 2);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 3);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 4);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 5);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 6);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 7);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 8);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 9);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 10);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 11);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 12);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 13);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 14);
+  readPixels_unrolled_x10(byteIndex + READ_PIXEL_X160_STEP * 15);
 }
 
 #define READ_PIXEL_X10_STEP 2
-void readPixel_x10(uint16_t byteIndex) {
-  readPixel(byteIndex + READ_PIXEL_X10_STEP * 0);
-  readPixel(byteIndex + READ_PIXEL_X10_STEP * 1);
-  readPixel(byteIndex + READ_PIXEL_X10_STEP * 2);
-  readPixel(byteIndex + READ_PIXEL_X10_STEP * 3);
-  readPixel(byteIndex + READ_PIXEL_X10_STEP * 4);
-  readPixel(byteIndex + READ_PIXEL_X10_STEP * 5);
-  readPixel(byteIndex + READ_PIXEL_X10_STEP * 6);
-  readPixel(byteIndex + READ_PIXEL_X10_STEP * 7);
-  readPixel(byteIndex + READ_PIXEL_X10_STEP * 8);
-  readPixel(byteIndex + READ_PIXEL_X10_STEP * 9);
+void readPixels_unrolled_x10(uint16_t byteIndex) {
+  readPixel_unrolled(byteIndex + READ_PIXEL_X10_STEP * 0);
+  readPixel_unrolled(byteIndex + READ_PIXEL_X10_STEP * 1);
+  readPixel_unrolled(byteIndex + READ_PIXEL_X10_STEP * 2);
+  readPixel_unrolled(byteIndex + READ_PIXEL_X10_STEP * 3);
+  readPixel_unrolled(byteIndex + READ_PIXEL_X10_STEP * 4);
+  readPixel_unrolled(byteIndex + READ_PIXEL_X10_STEP * 5);
+  readPixel_unrolled(byteIndex + READ_PIXEL_X10_STEP * 6);
+  readPixel_unrolled(byteIndex + READ_PIXEL_X10_STEP * 7);
+  readPixel_unrolled(byteIndex + READ_PIXEL_X10_STEP * 8);
+  readPixel_unrolled(byteIndex + READ_PIXEL_X10_STEP * 9);
 }
 
-void readPixel(uint16_t byteIndex) {
-  waitForRisingPixelClock();
-  lineBuffer[byteIndex] = getPixelByte();
-  waitForRisingPixelClock();
-  lineBuffer[byteIndex+1] = getPixelByte();
+
+
+void readPixel_unrolled(uint16_t byteIndex) {
+  waitForPixelClockRisingEdge();
+  lineBuffer[byteIndex + 0] = getPixelByte();
+  waitForPixelClockRisingEdge();
+  lineBuffer[byteIndex + 1] = getPixelByte();
 }
+
+
+
+void readPixels_loop_line() {
+  uint8_t *buff = lineBuffer;
+  uint8_t *buffEnd = buff+ cameraPixelColCount*2;
+  while (buff < buffEnd) {
+    waitForPixelClockRisingEdge();
+    *buff = getPixelByte();
+    buff++;
+    waitForPixelClockRisingEdge();
+    *buff = getPixelByte();
+    buff++;
+  }
+}
+
+
+void waitForPixelClockLow() {
+  while(PINB & PCLOCK_PORTB);
+}
+
+
+void waitForPixelClockRisingEdge() {
+#if PIXEL_CLOCK_WAITING == 1
+  while(!(PINB & PCLOCK_PORTB));
+#elif PIXEL_CLOCK_WAITING == 2
+  asm volatile("nop");
+#else
+  while(PINB & PCLOCK_PORTB);
+  while(!(PINB & PCLOCK_PORTB));
+#endif
+}
+
+
+
 
 uint8_t getPixelByte() {
   return (PINC & LOW_4_BITS_PORTC) | (PIND & HIGH_4_BITS_PORTD);
