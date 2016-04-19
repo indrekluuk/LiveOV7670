@@ -44,7 +44,7 @@ void setUpCamera() {
 
 void setUpScreen() {
   tft.initR(INITR_BLACKTAB);   // initialize a ST7735S chip, black tab
-  tft.fillScreen(ST7735_BLACK);
+  tft.fillScreen(ST7735_RED);
 }
 
 
@@ -205,38 +205,31 @@ void screenLineEnd()   {
 
 
 void sendLineBufferToDisplay() {
-  for (uint16_t i=0; i<(cameraPixelColCount * 2); i+=2) {
-    sendPixelByte(lineBuffer[i+1]);
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-
+  // bytes from camera are out of sync by one byte
+  sendPixelByte(0);
+  for (uint16_t i=0; i<(cameraPixelColCount * 2)-1; i++) {
     sendPixelByte(lineBuffer[i]);
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
   }
 }
 
 
 void sendPixelByte(uint8_t byte) {
   SPDR = byte;
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
 }
 
 
