@@ -82,24 +82,68 @@ inline void waitForRisingPixelClock(void) __attribute__((always_inline));
 inline uint8_t getPixelByte(void) __attribute__((always_inline));
 inline void nextScreenLineStart(void) __attribute__((always_inline));
 inline void screenLineEnd(void) __attribute__((always_inline));
+void sendLineBufferToDisplay();
 inline void sendPixelByte(uint8_t byte) __attribute__((always_inline));
 
 
 
-int screen_w = ST7735_TFTWIDTH;
-int screen_h = ST7735_TFTHEIGHT_18;
-int cameraPixelColCount = 160;
-int cameraPixelRowCount = 120;
-int scanLine;
+uint8_t screen_w = ST7735_TFTWIDTH;
+uint8_t screen_h = ST7735_TFTHEIGHT_18;
+const uint8_t cameraPixelColCount = 160;
+const uint8_t cameraPixelRowCount = 120;
+uint8_t scanLine;
+uint8_t lineBuffer[cameraPixelColCount * 2];
 
+
+#define COPY_PIXEL \
+    waitForRisingPixelClock();\
+    (*buff) = getPixelByte();\
+    buff++;\
+    waitForRisingPixelClock();\
+    (*buff) = getPixelByte();\
+    buff++
+
+
+#define COPY_PIXEL_x10 \
+    COPY_PIXEL;\
+    COPY_PIXEL;\
+    COPY_PIXEL;\
+    COPY_PIXEL;\
+    COPY_PIXEL;\
+    COPY_PIXEL;\
+    COPY_PIXEL;\
+    COPY_PIXEL;\
+    COPY_PIXEL;\
+    COPY_PIXEL
+
+#define COPY_PIXEL_x160 \
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10;\
+    COPY_PIXEL_x10
+
+//#define END_COPY_PIXEL_DEFINE
 
 
 void processFrame() {
   waitForVsync();
 
 
-  int pixelColIndex = 0;
-  int pixelRowIndex = 0;
+
+  uint8_t pixelColIndex = 0;
+  uint8_t pixelRowIndex = 0;
 
 
 
@@ -113,30 +157,13 @@ void processFrame() {
   while (pixelRowIndex < cameraPixelRowCount) {
     nextScreenLineStart();
 
+    uint8_t *buff = lineBuffer;
 
-    while(pixelColIndex < cameraPixelColCount) {
-      if (pixelColIndex < screen_h) {
+    //while(PINB & PCLOCK_PORTB);
+    COPY_PIXEL_x160;
 
-        waitForRisingPixelClock();
-        pixel_low = getPixelByte();
+    sendLineBufferToDisplay();
 
-        sendPixelByte(pixel_high);
-
-        waitForRisingPixelClock();
-        pixel_high = getPixelByte();
-
-        sendPixelByte(pixel_low);
-
-      } else {
-        // count off-screen pixel
-        waitForRisingPixelClock();
-        waitForRisingPixelClock();
-      }
-
-      pixelColIndex++;
-    }
-
-    pixelColIndex = 0;
     pixelRowIndex++;
     screenLineEnd();
   }
@@ -174,6 +201,37 @@ void nextScreenLineStart()   {
 
 void screenLineEnd()   {
   tft.endAddrWindow();
+}
+
+
+void sendLineBufferToDisplay() {
+  for (uint16_t i=0; i<(cameraPixelColCount * 2); i+=2) {
+    sendPixelByte(lineBuffer[i+1]);
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+
+    sendPixelByte(lineBuffer[i]);
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+  }
 }
 
 
