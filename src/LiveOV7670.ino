@@ -107,14 +107,10 @@ uint8_t lineBuffer[cameraPixelColCount * 2];
 void processFrame() {
   waitForVsync();
 
-
   uint8_t pixelRowIndex = 0;
-
   scanLine = screen_w;
 
-
   while (pixelRowIndex < cameraPixelRowCount) {
-
     waitForPixelClockLow();
 
     // 2.5 FPS or less:
@@ -127,7 +123,6 @@ void processFrame() {
     // 10 FPS
     #define PIXEL_CLOCK_WAITING 2
     readPixels_unrolled_x160(0);
-
 
     sendLineBufferToDisplay();
     pixelRowIndex++;
