@@ -10,7 +10,7 @@ const PROGMEM RegisterData OV7670Initializer::regsClock [] = {
 
     // 0x80 - enable double clock option (disabled => input / 2)
     // internal clock prescaler
-    {REG_CLKRC, 0x00}, // f = input / (val + 1)
+    {REG_CLKRC, 0x1 | 0x80}, // f = input / (val + 1)
 
     {REG_COM14,
         COM14_DCWEN // enable pixel clock divider

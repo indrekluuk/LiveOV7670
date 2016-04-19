@@ -79,10 +79,15 @@ void loop() {
 
 inline void waitForVsync(void) __attribute__((always_inline));
 inline void waitForRisingPixelClock(void) __attribute__((always_inline));
+
+inline void readPixel_x160(uint16_t byteIndex) __attribute__((always_inline));
+inline void readPixel_x10(uint16_t byteIndex) __attribute__((always_inline));
+inline void readPixel(uint16_t byteIndex) __attribute__((always_inline));
 inline uint8_t getPixelByte(void) __attribute__((always_inline));
-inline void nextScreenLineStart(void) __attribute__((always_inline));
+
+inline void sendLineBufferToDisplay() __attribute__((always_inline));
+inline void screenLineStart(void) __attribute__((always_inline));
 inline void screenLineEnd(void) __attribute__((always_inline));
-void sendLineBufferToDisplay();
 inline void sendPixelByte(uint8_t byte) __attribute__((always_inline));
 
 
@@ -95,77 +100,22 @@ uint8_t scanLine;
 uint8_t lineBuffer[cameraPixelColCount * 2];
 
 
-#define COPY_PIXEL \
-    waitForRisingPixelClock();\
-    (*buff) = getPixelByte();\
-    buff++;\
-    waitForRisingPixelClock();\
-    (*buff) = getPixelByte();\
-    buff++
-
-
-#define COPY_PIXEL_x10 \
-    COPY_PIXEL;\
-    COPY_PIXEL;\
-    COPY_PIXEL;\
-    COPY_PIXEL;\
-    COPY_PIXEL;\
-    COPY_PIXEL;\
-    COPY_PIXEL;\
-    COPY_PIXEL;\
-    COPY_PIXEL;\
-    COPY_PIXEL
-
-#define COPY_PIXEL_x160 \
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10;\
-    COPY_PIXEL_x10
-
-//#define END_COPY_PIXEL_DEFINE
-
 
 void processFrame() {
   waitForVsync();
 
 
-
-  uint8_t pixelColIndex = 0;
   uint8_t pixelRowIndex = 0;
-
-
 
   scanLine = screen_w;
 
 
-  uint8_t pixel_high = 0;
-  uint8_t pixel_low = 0;
-
-
   while (pixelRowIndex < cameraPixelRowCount) {
-    nextScreenLineStart();
 
-    uint8_t *buff = lineBuffer;
-
-    //while(PINB & PCLOCK_PORTB);
-    COPY_PIXEL_x160;
+    readPixel_x160(0);
 
     sendLineBufferToDisplay();
-
     pixelRowIndex++;
-    screenLineEnd();
   }
 
 
@@ -188,28 +138,75 @@ void waitForRisingPixelClock() {
 }
 
 
+#define READ_PIXEL_X160_STEP 20
+void readPixel_x160(uint16_t byteIndex) {
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 0);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 1);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 2);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 3);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 4);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 5);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 6);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 7);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 8);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 9);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 10);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 11);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 12);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 13);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 14);
+  readPixel_x10(byteIndex + READ_PIXEL_X160_STEP * 15);
+}
+
+#define READ_PIXEL_X10_STEP 2
+void readPixel_x10(uint16_t byteIndex) {
+  readPixel(byteIndex + READ_PIXEL_X10_STEP * 0);
+  readPixel(byteIndex + READ_PIXEL_X10_STEP * 1);
+  readPixel(byteIndex + READ_PIXEL_X10_STEP * 2);
+  readPixel(byteIndex + READ_PIXEL_X10_STEP * 3);
+  readPixel(byteIndex + READ_PIXEL_X10_STEP * 4);
+  readPixel(byteIndex + READ_PIXEL_X10_STEP * 5);
+  readPixel(byteIndex + READ_PIXEL_X10_STEP * 6);
+  readPixel(byteIndex + READ_PIXEL_X10_STEP * 7);
+  readPixel(byteIndex + READ_PIXEL_X10_STEP * 8);
+  readPixel(byteIndex + READ_PIXEL_X10_STEP * 9);
+}
+
+void readPixel(uint16_t byteIndex) {
+  waitForRisingPixelClock();
+  lineBuffer[byteIndex] = getPixelByte();
+  waitForRisingPixelClock();
+  lineBuffer[byteIndex+1] = getPixelByte();
+}
+
 uint8_t getPixelByte() {
   return (PINC & LOW_4_BITS_PORTC) | (PIND & HIGH_4_BITS_PORTD);
 }
 
 
-void nextScreenLineStart()   {
+
+
+void sendLineBufferToDisplay() {
+  screenLineStart();
+
+  // bytes from camera are out of sync by one byte
+  sendPixelByte(0);
+  for (uint16_t i=0; i<(cameraPixelColCount * 2) - 1; i++) {
+    sendPixelByte(lineBuffer[i]);
+  }
+
+  screenLineEnd();
+}
+
+
+void screenLineStart()   {
   if (scanLine > 0) scanLine--;
   tft.startAddrWindow(scanLine, 0, scanLine, screen_h-1);
 }
 
 
-void screenLineEnd()   {
+void screenLineEnd() {
   tft.endAddrWindow();
-}
-
-
-void sendLineBufferToDisplay() {
-  // bytes from camera are out of sync by one byte
-  sendPixelByte(0);
-  for (uint16_t i=0; i<(cameraPixelColCount * 2)-1; i++) {
-    sendPixelByte(lineBuffer[i]);
-  }
 }
 
 
