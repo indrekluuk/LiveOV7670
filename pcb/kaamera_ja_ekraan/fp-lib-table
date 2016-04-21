@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name arduino)(type Legacy)(uri "$(KIPRJMOD)\\LibMod\\YJ_arduino\\arduino.mod")(options "")(descr ""))
+  (lib (name LevelShifter_4ch)(type KiCad)(uri "$(KIPRJMOD)\\LibMod\\Indrek\\LevelShifter_4ch.pretty")(options "")(descr ""))
+)
