@@ -2,13 +2,13 @@
 // Created by indrek on 17.04.2016.
 //
 
-#include "OV7670Initializer.h"
+#include "CameraOV7670.h"
 
 
 /*
  * https://github.com/ComputerNerd/ov7670-no-ram-arduino-uno/blob/master/ov7670.c
  */
-const PROGMEM RegisterData OV7670Initializer::regsQQVGA [] = {
+const PROGMEM RegisterData CameraOV7670::regsQQVGA [] = {
     {REG_COM3, COM3_DCWEN}, // enable downsamp/crop/window
 
     {REG_COM14, 0x1a},	// divide by 4

@@ -2,14 +2,14 @@
 // Created by indrek on 17.04.2016.
 //
 
-#include "OV7670Initializer.h"
+#include "CameraOV7670.h"
 
 
 /*
  * https://github.com/ComputerNerd/ov7670-no-ram-arduino-uno/blob/master/ov7670.c
  */
 
-const PROGMEM RegisterData OV7670Initializer::regsDefault [] = { //from the linux driver
+const PROGMEM RegisterData CameraOV7670::regsDefault [] = { //from the linux driver
                          {REG_COM7, COM7_RESET},
                          {REG_TSLB,  0x04},	/* OV */
                          {REG_COM7, 0},	    /* VGA */

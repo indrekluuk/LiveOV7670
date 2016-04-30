@@ -2,13 +2,13 @@
 // Created by indrek on 17.04.2016.
 //
 
-#include "OV7670Initializer.h"
+#include "CameraOV7670.h"
 
 
 /*
  * https://github.com/ComputerNerd/ov7670-no-ram-arduino-uno/blob/master/ov7670.c
  */
-const PROGMEM RegisterData OV7670Initializer::regsRGB565 [] = {
+const PROGMEM RegisterData CameraOV7670::regsRGB565 [] = {
     {REG_COM7, COM7_RGB}, /* Selects RGB mode */
     {REG_RGB444, 0},	  /* No RGB444 please */
     {REG_COM1, 0x0},
