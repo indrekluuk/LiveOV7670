@@ -1,10 +1,14 @@
 
 Arduino PIN connections:
 
-PIN2 - Vertical sync
-PIN3 - Clock input for camera
-PIN12 - Pixel clock
-A4 - I2C data
-A5 - I2C clock
-A0..A3 - Pixel data bits 0..3
-PIN4..PIN7 - Pixel data bits 4..7
+VSYNC - PIN2
+XCLCK - PIN3
+PCLCK - PIN12
+SIOD - A4 (I2C data)
+SIOC - A5 (I2C clock)
+D0..D3 - A0..A3 (pixel data bits 0..3)
+D4..D7 - PIN4..PIN7 (pixel data bits 4..7)
+3.3V - 3.3V
+RESET - 3.3V
+GND - GND
+PWDN - GND
