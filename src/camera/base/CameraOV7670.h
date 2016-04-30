@@ -1,7 +1,5 @@
 
 
-// https://github.com/ComputerNerd/ov7670-no-ram-arduino-uno
-
 #ifndef _CAMERA_OV7670_h_
 #define _CAMERA_OV7670_h_
 
