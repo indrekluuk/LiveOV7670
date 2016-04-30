@@ -1,7 +1,7 @@
 
 #include "screen/Adafruit_ST7735_mod.h"
 #include "camera/CameraOV7670_QQVGA_10hz.h"
-#include "camera/CameraOV7670_QQVGA.h"
+//#include "camera/CameraOV7670_QQVGA.h"
 
 
 
