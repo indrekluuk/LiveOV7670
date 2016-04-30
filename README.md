@@ -18,7 +18,7 @@ Compiling in Arduino IDE:
 OV7670 connections:  
   
 VSYNC - PIN2  
-XCLCK - PIN3  
+XCLCK - PIN3 (must be level shifted from 5V to 3.3V)  
 PCLCK - PIN12  
 SIOD  - A4 (I2C data)  
 SIOC  - A5 (I2C clock)  
@@ -31,11 +31,14 @@ PWDN  - GND
   
 Arduino to TFT PIN connections:  
   
-PIN 8  - DC  
-PIN 9  - CS  
-PIN 10 - RESET  
-PIN 11 - SPI data  
-PIN 13 - SPI clock  
+DC - PIN 8 (must be level shifted from 5V to 3.3V)  
+CS - PIN 9 (must be level shifted from 5V to 3.3V)  
+RESET - PIN 10 (must be level shifted from 5V to 3.3V)  
+SPI data - PIN 11 (must be level shifted from 5V to 3.3V)  
+SPI clock - PIN 13 (must be level shifted from 5V to 3.3V)  
+VCC - 5V/3.3V (depending on jumper position on the TFT board)  
+BL - 3.3V  
+GND - GND  
   
 -------------------------------------------------------------------------------
   
