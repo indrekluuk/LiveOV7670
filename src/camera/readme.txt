@@ -2,7 +2,7 @@
 Arduino PIN connections:
 
 VSYNC - PIN2
-XCLCK - PIN3
+XCLCK - PIN3 (must be level shifted from 5V -> 3.3V)
 PCLCK - PIN12
 SIOD - A4 (I2C data)
 SIOC - A5 (I2C clock)
