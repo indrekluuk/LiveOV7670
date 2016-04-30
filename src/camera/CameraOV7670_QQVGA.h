@@ -8,7 +8,7 @@
 #include "base/BufferedCameraOV7670.h"
 
 
-// 160 x 120 @ 5Hz
+// 160 x 120 @ 5Hz or less
 class CameraOV7670_QQVGA : public BufferedCameraOV7670<160, 120> {
 
 private:
