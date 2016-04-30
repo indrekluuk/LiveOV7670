@@ -13,9 +13,9 @@ Compiling in Arduino IDE:
   
 Arduino to OV7670 PIN connections:  
   
-PIN2  - Vertical sync in  
-PIN3  - Clock out  
-PIN12 - Pixel Clock in  
+PIN2  - Vertical sync  
+PIN3  - Clock input for camera  
+PIN12 - Pixel clock  
 A4    - I2C data  
 A5    - I2C clock  
 A0..A3     - Pixel data bits 0..3  
@@ -26,8 +26,8 @@ Arduino to TFT PIN connections:
 PIN 8  - DC  
 PIN 9  - CS  
 PIN 10 - RESET  
-PIN 11 - SPI data in  
-PIN 13 - SPI clock out  
+PIN 11 - SPI data  
+PIN 13 - SPI clock  
   
 -------------------------------------------------------------------------------
   
