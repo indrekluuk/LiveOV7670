@@ -29,7 +29,7 @@ RESET - 3.3V
 GND   - GND  
 PWDN  - GND  
   
-Arduino to TFT PIN connections:  
+1.8" TFT connections:  
   
 DC - PIN 8 (5V -> 3.3V)  
 CS - PIN 9 (5V -> 3.3V)  
