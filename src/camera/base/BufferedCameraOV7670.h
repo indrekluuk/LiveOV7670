@@ -11,7 +11,7 @@
 
 // Pixel receiving order from camera: Pixel_1_H, Pixel_1_L, Pixel_2_H, Pixel_2_L ...
 // First byte from camera is half a pixel (lower byte of a pixel).
-// Shift line data data by 1 byte to correct it.
+// Shift line data by 1 byte to correct it.
 // This means that first pixel in each line is actually broken.
 template <uint16_t size>
 union OV7670PixelBuffer {
