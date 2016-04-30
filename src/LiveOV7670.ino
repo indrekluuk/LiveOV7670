@@ -5,8 +5,8 @@
 
 
 
-//CameraOV7670_QQVGA cameraOV7670(CameraOV7670::PIXEL_RGB565, CameraOV7670::FPS_5_Hz);
 CameraOV7670_QQVGA_10hz cameraOV7670(CameraOV7670::PIXEL_RGB565);
+//CameraOV7670_QQVGA cameraOV7670(CameraOV7670::PIXEL_RGB565, CameraOV7670::FPS_5_Hz);
 
 int TFT_RST = 10;
 int TFT_CS  = 9;
@@ -15,12 +15,6 @@ int TFT_DC  = 8;
 Adafruit_ST7735_mod tft = Adafruit_ST7735_mod(TFT_CS, TFT_DC, TFT_RST);
 
 
-
-void sleep(uint64_t milliseconds) {
-  for (uint64_t d = 0; d<196*milliseconds; d++) {
-    asm volatile("nop");
-  }
-}
 
 
 void setup() {
@@ -33,16 +27,12 @@ void setup() {
 
 
 
-void loop() {
-  processFrame();
-}
 
-
-
-inline void sendLineBufferToDisplay() __attribute__((always_inline));
+inline void sendLineToDisplay() __attribute__((always_inline));
 inline void screenLineStart(void) __attribute__((always_inline));
 inline void screenLineEnd(void) __attribute__((always_inline));
 inline void sendPixelByte(uint8_t byte) __attribute__((always_inline));
+
 
 
 
@@ -52,33 +42,28 @@ uint8_t screen_h = ST7735_TFTWIDTH;
 uint8_t screenLineIndex;
 
 
-void processFrame() {
+void loop() {
   screenLineIndex = screen_h;
-  uint8_t lineIndex = 0;
 
   cameraOV7670.waitForVsync();
 
-  while (lineIndex < cameraOV7670.getLineCount()) {
+  for (uint8_t i = 0; i < cameraOV7670.getLineCount(); i++) {
     cameraOV7670.readLine();
-    sendLineBufferToDisplay();
-    lineIndex++;
+    sendLineToDisplay();
   }
 }
 
 
 
-void sendLineBufferToDisplay() {
-  screenLineStart();
 
+
+void sendLineToDisplay() {
+  screenLineStart();
   for (uint16_t i=0; i<cameraOV7670.getPixelBufferLength(); i++) {
     sendPixelByte(cameraOV7670.getPixelByte(i));
   }
-
   screenLineEnd();
 }
-
-
-
 
 void screenLineStart()   {
   if (screenLineIndex > 0) screenLineIndex--;
