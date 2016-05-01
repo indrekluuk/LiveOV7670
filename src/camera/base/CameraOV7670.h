@@ -30,12 +30,6 @@ public:
     PIXEL_YUV422
   };
 
-  enum FramesPerSecond {
-    FPS_5_Hz,
-    FPS_3p33_Hz,
-    FPS_2p5_Hz,
-    FPS_2_Hz
-  };
 
 private:
   static const int i2cAddress = 0x21;
@@ -53,7 +47,9 @@ public:
   CameraOV7670(PixelFormat format, uint8_t internalClockPreScaler);
   void init();
   inline void waitForVsync(void) __attribute__((always_inline));
+  inline void waitForPixelClockRisingEdge(void) __attribute__((always_inline));
   inline void waitForPixelClockLow(void) __attribute__((always_inline));
+  inline void waitForPixelClockHigh(void) __attribute__((always_inline));
   inline uint8_t readPixelByte(void) __attribute__((always_inline));
 
 
@@ -74,8 +70,17 @@ void CameraOV7670::waitForVsync() {
   while(!(PIND & OV7670_VSYNC_PORTD));
 }
 
+void CameraOV7670::waitForPixelClockRisingEdge() {
+  waitForPixelClockLow();
+  waitForPixelClockHigh();
+}
+
 void CameraOV7670::waitForPixelClockLow() {
   while(PINB & OV7670_PCLOCK_PORTB);
+}
+
+void CameraOV7670::waitForPixelClockHigh() {
+  while(!(PINB & OV7670_PCLOCK_PORTB));
 }
 
 uint8_t CameraOV7670::readPixelByte() {

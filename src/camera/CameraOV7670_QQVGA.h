@@ -11,6 +11,15 @@
 // 160 x 120 @ 5Hz or less
 class CameraOV7670_QQVGA : public BufferedCameraOV7670<160, 120> {
 
+public:
+  enum FramesPerSecond {
+    FPS_5_Hz,
+    FPS_3p33_Hz,
+    FPS_2p5_Hz,
+    FPS_2_Hz
+  };
+
+
 private:
   FramesPerSecond framesPerSecond;
 
@@ -68,13 +77,10 @@ void CameraOV7670_QQVGA::readLine() {
 
   } else {
 
-    waitForPixelClockLow();
     while (bufferIndex < getPixelBufferLength()) {
-      while(PINB & OV7670_PCLOCK_PORTB);
-      while(!(PINB & OV7670_PCLOCK_PORTB));
+      waitForPixelClockRisingEdge();
       pixelBuffer.writeBuffer[bufferIndex++] = readPixelByte();
-      while(PINB & OV7670_PCLOCK_PORTB);
-      while(!(PINB & OV7670_PCLOCK_PORTB));
+      waitForPixelClockRisingEdge();
       pixelBuffer.writeBuffer[bufferIndex++] = readPixelByte();
     }
   }
