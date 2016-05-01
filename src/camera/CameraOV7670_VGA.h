@@ -18,10 +18,9 @@ private:
 
 public:
   enum FramesPerSecond {
-    FPS_5_Hz,
-    FPS_3p33_Hz,
-    FPS_2p5_Hz,
-    FPS_2_Hz
+    FPS_1_Hz,
+    FPS_0p5_Hz,
+    FPS_0p33_Hz
   };
 
 
@@ -43,14 +42,12 @@ private:
   static uint8_t getPreScalerForFps(FramesPerSecond fps) {
     switch (fps) {
       default:
-      case FPS_5_Hz:
-        return 1;
-      case FPS_3p33_Hz:
-        return 2;
-      case FPS_2p5_Hz:
-        return 3;
-      case FPS_2_Hz:
-        return 15;
+      case FPS_1_Hz:
+        return 9;
+      case FPS_0p5_Hz:
+        return 19;
+      case FPS_0p33_Hz:
+        return 29;
     }
   }
 };

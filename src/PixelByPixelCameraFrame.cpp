@@ -13,7 +13,8 @@
 
 
 
-CameraOV7670_VGA camera(CameraOV7670::PIXEL_RGB565, CameraOV7670_VGA::FPS_2_Hz);
+// Since the 1.8" TFT screen is only 160x128 only top right corner of the VGA picture is visible.
+CameraOV7670_VGA camera(CameraOV7670::PIXEL_RGB565, CameraOV7670_VGA::FPS_1_Hz);
 
 
 
@@ -58,43 +59,29 @@ void processFrame() {
 
   camera.waitForVsync();
 
-  uint8_t hByte = 0;
-  uint8_t lByte = 0;
+  uint8_t lowByte = 0;
+  uint8_t bufferedLowByte = 0;
 
   for (uint16_t y = 0; y < camera.getLineCount(); y++) {
 
     screenLineStart();
 
-    //sendPixelByte(0);
+    // For full VGA resolution byte order from camera is low1, high1, low2, high2
+    // We have to swap byte order for screen.
+
     camera.waitForPixelClockRisingEdge();
-    lByte = camera.readPixelByte();
+    bufferedLowByte = camera.readPixelByte();
 
     for (uint16_t x = 0; x < camera.getLineLength()-1; x++) {
 
       camera.waitForPixelClockRisingEdge();
-      hByte = camera.readPixelByte();
-      sendPixelByte(hByte);
+      sendPixelByte(camera.readPixelByte()); // send pixel high byte
 
+      lowByte = bufferedLowByte;
       camera.waitForPixelClockRisingEdge();
-      uint8_t lByte2 = camera.readPixelByte();
-      sendPixelByte(lByte);
-      lByte = lByte2;
-
+      bufferedLowByte = camera.readPixelByte();
+      sendPixelByte(lowByte); // send pixel low byte
     }
-
-
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
-    asm volatile("nop");
 
     screenLineEnd();
   }
@@ -110,6 +97,16 @@ void screenLineStart()   {
 }
 
 void screenLineEnd() {
+
+  // just on case some delay. Probably is not necessary
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+
   tft.endAddrWindow();
 }
 
@@ -119,21 +116,6 @@ void sendPixelByte(uint8_t byte) {
 
   // this must be adjusted if sending loop more/less instructions
 
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-
-
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
 
   /*
   asm volatile("nop");
