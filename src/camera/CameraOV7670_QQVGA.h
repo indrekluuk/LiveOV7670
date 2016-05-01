@@ -25,7 +25,7 @@ private:
 
 public:
   CameraOV7670_QQVGA(PixelFormat format, FramesPerSecond fps) :
-      BufferedCameraOV7670(format, getPreScalerForFps(fps)),
+      BufferedCameraOV7670(Resolution::RESOLUTION_QQVGA_160x120, format, getPreScalerForFps(fps)),
       framesPerSecond(fps)
   {};
 

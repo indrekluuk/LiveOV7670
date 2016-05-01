@@ -30,6 +30,11 @@ public:
     PIXEL_YUV422
   };
 
+  enum Resolution {
+    RESOLUTION_QVGA_320x240,
+    RESOLUTION_QQVGA_160x120
+  };
+
 
 private:
   static const int i2cAddress = 0x21;
@@ -37,14 +42,20 @@ private:
   static const RegisterData regsRGB565[];
   static const RegisterData regsYUV422[];
   static const RegisterData regsQQVGA[];
+  static const RegisterData regsQVGA[];
 
+  Resolution resolution;
   PixelFormat pixelFormat;
   uint8_t internalClockPreScaler;
 
 
 public:
 
-  CameraOV7670(PixelFormat format, uint8_t internalClockPreScaler);
+  CameraOV7670(Resolution resolution, PixelFormat format, uint8_t internalClockPreScaler) :
+      resolution(resolution),
+      pixelFormat(format),
+      internalClockPreScaler(internalClockPreScaler) {};
+
   void init();
   inline void waitForVsync(void) __attribute__((always_inline));
   inline void waitForPixelClockRisingEdge(void) __attribute__((always_inline));

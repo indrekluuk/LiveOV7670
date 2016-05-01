@@ -3,13 +3,6 @@
 
 
 
-CameraOV7670::CameraOV7670(PixelFormat format, uint8_t internalClockPreScaler) :
-    pixelFormat(format),
-    internalClockPreScaler(internalClockPreScaler) {
-}
-
-
-
 void CameraOV7670::init() {
   Wire.begin();
   initClock();
@@ -41,7 +34,16 @@ void CameraOV7670::setUpCamera() {
       break;
   }
 
-  setRegisters(regsQQVGA);
+  switch (resolution) {
+    case RESOLUTION_QVGA_320x240:
+      setRegisters(regsQVGA);
+      break;
+    default:
+    case RESOLUTION_QQVGA_160x120:
+      setRegisters(regsQQVGA);
+      break;
+  }
+
 
   setRegister(REG_COM10, COM10_PCLK_HB); // disable pixel clock during blank lines
   setRegister(REG_CLKRC, 0x80 | internalClockPreScaler); // f = input / (val + 1)
