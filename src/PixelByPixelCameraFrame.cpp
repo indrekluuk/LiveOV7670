@@ -66,18 +66,19 @@ void processFrame() {
     screenLineStart();
 
     //sendPixelByte(0);
-    //camera.waitForPixelClockRisingEdge();
-    //camera.readPixelByte();
+    camera.waitForPixelClockRisingEdge();
+    lByte = camera.readPixelByte();
 
-    for (uint16_t x = 0; x < camera.getLineLength(); x++) {
-
-      camera.waitForPixelClockRisingEdge();
-      lByte = camera.readPixelByte();
-      sendPixelByte(hByte);
+    for (uint16_t x = 0; x < camera.getLineLength()-1; x++) {
 
       camera.waitForPixelClockRisingEdge();
       hByte = camera.readPixelByte();
+      sendPixelByte(hByte);
+
+      camera.waitForPixelClockRisingEdge();
+      uint8_t lByte2 = camera.readPixelByte();
       sendPixelByte(lByte);
+      lByte = lByte2;
 
     }
 
