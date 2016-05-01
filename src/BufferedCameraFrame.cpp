@@ -10,9 +10,9 @@
 
 #include "Arduino.h"
 #include "screen/Adafruit_ST7735_mod.h"
-#include "camera/BufferedCameraOV7670_QQVGA_10hz.h"
-#include "camera/BufferedCameraOV7670_QQVGA.h"
-#include "camera/BufferedCameraOV7670_QVGA.h"
+#include "camera/buffered/BufferedCameraOV7670_QQVGA_10hz.h"
+#include "camera/buffered/BufferedCameraOV7670_QQVGA.h"
+#include "camera/buffered/BufferedCameraOV7670_QVGA.h"
 
 
 
