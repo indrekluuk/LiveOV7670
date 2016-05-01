@@ -18,7 +18,7 @@
  *
  */
 
-#define BUFFERED_CAMERA 0
+#define BUFFERED_CAMERA 1
 
 
 
