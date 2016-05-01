@@ -102,7 +102,7 @@ void screenLineEnd() {
 void sendPixelByte(uint8_t byte) {
   SPDR = byte;
 
-  // this must be adjusted if sending loop more/less instructions
+  // this must be adjusted if sending loop has more/less instructions
 
   asm volatile("nop");
   asm volatile("nop");
