@@ -51,6 +51,7 @@ void initializeScreenAndCamera() {
 inline void screenLineStart(void) __attribute__((always_inline));
 inline void screenLineEnd(void) __attribute__((always_inline));
 inline void sendPixelByte(uint8_t byte) __attribute__((always_inline));
+inline void pixelSendingDelay() __attribute__((always_inline));
 
 
 
@@ -93,6 +94,14 @@ void processFrame() {
       sendPixelByte(lowByte); // send pixel low byte
     }
 
+    // send last pixel
+    camera.waitForPixelClockRisingEdge();
+    sendPixelByte(camera.readPixelByte()); // send pixel high byte
+    pixelSendingDelay(); // prevent sending collision
+    sendPixelByte(bufferedLowByte); // send pixel low byte
+    pixelSendingDelay();
+
+
     screenLineEnd();
   }
 }
@@ -107,16 +116,6 @@ void screenLineStart()   {
 }
 
 void screenLineEnd() {
-
-  // just on case some delay. Probably is not necessary
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-
   tft.endAddrWindow();
 }
 
@@ -135,6 +134,30 @@ void sendPixelByte(uint8_t byte) {
   asm volatile("nop");
   asm volatile("nop");
   */
+}
+
+
+
+void pixelSendingDelay() {
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+
 }
 
 
