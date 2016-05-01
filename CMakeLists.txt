@@ -51,6 +51,7 @@ add_executable(LiveOV7670
         src/camera/base/CameraOV7670.cpp
         src/camera/base/CameraOV7670RegsDefault.cpp
         src/camera/base/CameraOV7670RegsQQVGA.cpp
+        src/camera/base/CameraOV7670RegsQVGA.cpp
         src/camera/base/CameraOV7670RegsRGB565.cpp
         src/camera/base/CameraOV7670RegsYUV422.cpp
         src/screen/Adafruit_ST7735_mod.cpp

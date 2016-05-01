@@ -1,12 +1,14 @@
 
 #include "screen/Adafruit_ST7735_mod.h"
-#include "camera/CameraOV7670_QQVGA_10hz.h"
-#include "camera/CameraOV7670_QQVGA.h"
+#include "camera/BufferedCameraOV7670_QQVGA_10hz.h"
+#include "camera/BufferedCameraOV7670_QQVGA.h"
+#include "camera/BufferedCameraOV7670_QVGA.h"
 
 
 
-CameraOV7670_QQVGA_10hz cameraOV7670(CameraOV7670::PIXEL_RGB565);
-//CameraOV7670_QQVGA cameraOV7670(CameraOV7670::PIXEL_RGB565, CameraOV7670_QQVGA::FPS_5_Hz);
+BufferedCameraOV7670_QQVGA_10hz cameraOV7670(CameraOV7670::PIXEL_RGB565);
+//BufferedCameraOV7670_QQVGA cameraOV7670(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QQVGA::FPS_2p5_Hz);
+//BufferedCameraOV7670_QVGA cameraOV7670(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QVGA::FPS_2_Hz);
 
 int TFT_RST = 10;
 int TFT_CS  = 9;
@@ -56,14 +58,18 @@ void loop() {
 
 
 
+static const uint16_t byteCountForDisplay = cameraOV7670.getPixelBufferLength() < screen_w*2 ?
+    cameraOV7670.getPixelBufferLength() : screen_w*2;
+
 
 void sendLineToDisplay() {
   screenLineStart();
-  for (uint16_t i=0; i<cameraOV7670.getPixelBufferLength(); i++) {
+  for (uint16_t i=0; i<byteCountForDisplay; i++) {
     sendPixelByte(cameraOV7670.getPixelByte(i));
   }
   screenLineEnd();
 }
+
 
 void screenLineStart()   {
   if (screenLineIndex > 0) screenLineIndex--;
@@ -80,12 +86,12 @@ void sendPixelByte(uint8_t byte) {
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
-  asm volatile("nop");
+//  asm volatile("nop");
+//  asm volatile("nop");
+//  asm volatile("nop");
+//  asm volatile("nop");
+//  asm volatile("nop");
+//  asm volatile("nop");
+//  asm volatile("nop");
 }
 

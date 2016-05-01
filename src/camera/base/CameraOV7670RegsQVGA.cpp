@@ -9,6 +9,8 @@
  * https://github.com/ComputerNerd/ov7670-no-ram-arduino-uno/blob/master/ov7670.c
  */
 const PROGMEM RegisterData CameraOV7670::regsQVGA [] = {
+    {REG_COM3, COM3_DCWEN}, // enable downsamp/crop/window
+
     {REG_COM14, 0x19},
     {0x72, 0x11},
     {0x73, 0xf1},

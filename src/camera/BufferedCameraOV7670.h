@@ -41,7 +41,7 @@ public:
   BufferedCameraOV7670(Resolution resolution, PixelFormat format, uint8_t internalClockPreScaler) :
       CameraOV7670(resolution, format, internalClockPreScaler) {};
 
-  virtual void readLine() = 0;
+  virtual inline void readLine() __attribute__((always_inline));
 
   inline uint16_t getLineLength() __attribute__((always_inline));
   inline uint16_t getLineCount() __attribute__((always_inline));
@@ -78,6 +78,27 @@ template <uint16_t x, uint16_t y>
 uint8_t BufferedCameraOV7670<x, y>::getPixelByte(uint16_t byteIndex) {
   return pixelBuffer.readBuffer[byteIndex];
 }
+
+
+
+
+template <uint16_t x, uint16_t y>
+void BufferedCameraOV7670<x, y>::readLine() {
+
+  pixelBuffer.writeBufferPadding = 0;
+  uint16_t bufferIndex = 0;
+
+  while (bufferIndex < getPixelBufferLength()) {
+    waitForPixelClockRisingEdge();
+    pixelBuffer.writeBuffer[bufferIndex++] = readPixelByte();
+    waitForPixelClockRisingEdge();
+    pixelBuffer.writeBuffer[bufferIndex++] = readPixelByte();
+  }
+}
+
+
+
+
 
 
 
