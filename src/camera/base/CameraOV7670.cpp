@@ -35,6 +35,9 @@ void CameraOV7670::setUpCamera() {
   }
 
   switch (resolution) {
+    case RESOLUTION_VGA_640x480:
+      setRegisters(regsVGA);
+      break;
     case RESOLUTION_QVGA_320x240:
       setRegisters(regsQVGA);
       break;

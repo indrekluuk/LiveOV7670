@@ -52,6 +52,7 @@ public:
   };
 
   enum Resolution {
+    RESOLUTION_VGA_640x480,
     RESOLUTION_QVGA_320x240,
     RESOLUTION_QQVGA_160x120
   };
@@ -64,6 +65,7 @@ private:
   static const RegisterData regsYUV422[];
   static const RegisterData regsQQVGA[];
   static const RegisterData regsQVGA[];
+  static const RegisterData regsVGA[];
 
   Resolution resolution;
   PixelFormat pixelFormat;

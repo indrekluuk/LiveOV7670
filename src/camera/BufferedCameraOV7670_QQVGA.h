@@ -53,7 +53,7 @@ private:
 
 void BufferedCameraOV7670_QQVGA::readLine() {
 
-  // reading loop is too tight for 5Hz to wait for raising clock edge
+  // reading loop is too tight fro 5Hz to wait for raising clock edge
   if (framesPerSecond == FPS_5_Hz) {
     pixelBuffer.writeBufferPadding = 0;
     uint16_t bufferIndex = 0;
