@@ -5,7 +5,7 @@
 #ifndef _CAMERAOV7670LINEBUFFER_H
 #define _CAMERAOV7670LINEBUFFER_H
 
-#include "CameraOV7670.h"
+#include "base/CameraOV7670.h"
 
 
 

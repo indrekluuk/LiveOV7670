@@ -5,7 +5,7 @@
 #ifndef _CAMERAOV7670_QQVGA_H
 #define _CAMERAOV7670_QQVGA_H
 
-#include "base/BufferedCameraOV7670.h"
+#include "BufferedCameraOV7670.h"
 
 
 // 160 x 120 @ 5Hz or less
