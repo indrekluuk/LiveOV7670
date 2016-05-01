@@ -1,5 +1,5 @@
 
-Arduino PIN connections:
+OV7670 PIN connections:
 
 VSYNC - PIN2
 XCLCK - PIN3 (must be level shifted from 5V -> 3.3V)
