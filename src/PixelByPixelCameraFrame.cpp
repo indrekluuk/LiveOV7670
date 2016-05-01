@@ -9,12 +9,22 @@
 
 #include "Arduino.h"
 #include "screen/Adafruit_ST7735_mod.h"
-#include "camera/CameraOV7670_VGA.h"
+#include "camera/base/CameraOV7670.h"
+
+
+// scaler values for specific refresh rates
+static const uint8_t FPS_1_Hz = 9;
+static const uint8_t FPS_0p5_Hz = 19;
+static const uint8_t FPS_0p33_Hz = 29;
+
+
+static const uint16_t lineLength = 640;
+static const uint16_t lineCount = 480;
 
 
 
 // Since the 1.8" TFT screen is only 160x128 only top right corner of the VGA picture is visible.
-CameraOV7670_VGA camera(CameraOV7670::PIXEL_RGB565, CameraOV7670_VGA::FPS_1_Hz);
+CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_RGB565, FPS_1_Hz);
 
 
 
@@ -62,17 +72,17 @@ void processFrame() {
   uint8_t lowByte = 0;
   uint8_t bufferedLowByte = 0;
 
-  for (uint16_t y = 0; y < camera.getLineCount(); y++) {
+  for (uint16_t y = 0; y < lineCount; y++) {
 
     screenLineStart();
 
     // For full VGA resolution byte order from camera is low1, high1, low2, high2
-    // We have to swap byte order for screen.
+    // We have to swap byte order for the screen.
 
     camera.waitForPixelClockRisingEdge();
     bufferedLowByte = camera.readPixelByte();
 
-    for (uint16_t x = 0; x < camera.getLineLength()-1; x++) {
+    for (uint16_t x = 0; x < lineLength-1; x++) {
 
       camera.waitForPixelClockRisingEdge();
       sendPixelByte(camera.readPixelByte()); // send pixel high byte
@@ -114,8 +124,7 @@ void screenLineEnd() {
 void sendPixelByte(uint8_t byte) {
   SPDR = byte;
 
-  // this must be adjusted if sending loop more/less instructions
-
+  // this must be adjusted if sending loop has more/less instructions
 
   /*
   asm volatile("nop");
