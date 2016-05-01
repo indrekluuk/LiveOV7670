@@ -50,7 +50,6 @@ add_executable(LiveOV7670
         src/LiveOV7670.ino
         src/camera/base/CameraOV7670.cpp
         src/camera/base/CameraOV7670RegsDefault.cpp
-        src/camera/base/CameraOV7670RegsClock.cpp
         src/camera/base/CameraOV7670RegsQQVGA.cpp
         src/camera/base/CameraOV7670RegsRGB565.cpp
         src/camera/base/CameraOV7670RegsYUV422.cpp

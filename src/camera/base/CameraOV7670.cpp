@@ -29,8 +29,8 @@ void CameraOV7670::initClock() {
 
 void CameraOV7670::setUpCamera() {
   resetSettings();
-
   setRegisters(regsDefault);
+
   switch (pixelFormat) {
     default:
     case PIXEL_RGB565:
@@ -43,10 +43,8 @@ void CameraOV7670::setUpCamera() {
 
   setRegisters(regsQQVGA);
 
-  setRegisters(regsClock);
-  if (internalClockPreScaler > 0){
-    addBitsToRegister(REG_CLKRC, internalClockPreScaler);
-  }
+  setRegister(REG_COM10, COM10_PCLK_HB); // disable pixel clock during blank lines
+  setRegister(REG_CLKRC, 0x80 | internalClockPreScaler); // f = input / (val + 1)
 
 }
 

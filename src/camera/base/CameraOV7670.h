@@ -43,7 +43,6 @@ private:
   static const RegisterData regsRGB565[];
   static const RegisterData regsYUV422[];
   static const RegisterData regsQQVGA[];
-  static const RegisterData regsClock[];
 
   PixelFormat pixelFormat;
   uint8_t internalClockPreScaler;
