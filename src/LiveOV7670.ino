@@ -8,7 +8,7 @@
 
 BufferedCameraOV7670_QQVGA_10hz cameraOV7670(CameraOV7670::PIXEL_RGB565);
 //BufferedCameraOV7670_QQVGA cameraOV7670(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QQVGA::FPS_2p5_Hz);
-//BufferedCameraOV7670_QVGA cameraOV7670(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QVGA::FPS_2_Hz);
+//BufferedCameraOV7670_QVGA cameraOV7670(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QVGA::FPS_2p5_Hz);
 
 int TFT_RST = 10;
 int TFT_CS  = 9;
@@ -63,11 +63,14 @@ static const uint16_t byteCountForDisplay = cameraOV7670.getPixelBufferLength() 
 
 
 void sendLineToDisplay() {
-  screenLineStart();
-  for (uint16_t i=0; i<byteCountForDisplay; i++) {
-    sendPixelByte(cameraOV7670.getPixelByte(i));
+  if (screenLineIndex > 0) {
+
+    screenLineStart();
+    for (uint16_t i=0; i<byteCountForDisplay; i++) {
+      sendPixelByte(cameraOV7670.getPixelByte(i));
+    }
+    screenLineEnd();
   }
-  screenLineEnd();
 }
 
 
@@ -82,16 +85,21 @@ void screenLineEnd() {
 
 void sendPixelByte(uint8_t byte) {
   SPDR = byte;
+
+  // this must be adjusted if sending loop more/less instructions
+
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
-//  asm volatile("nop");
-//  asm volatile("nop");
-//  asm volatile("nop");
-//  asm volatile("nop");
-//  asm volatile("nop");
-//  asm volatile("nop");
-//  asm volatile("nop");
+  /*
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  */
 }
 
