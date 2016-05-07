@@ -21,9 +21,11 @@
  *
  *  EXAMPLE = 3
  *  Reads data from camera and send it over UART to computer
+ *  Java application for receiving picture from UART
+ *  https://github.com/indrekluuk/ArduinoImageCapture/tree/master/ArduinoImageCapture
  *
  */
-#define EXAMPLE 3
+#define EXAMPLE 1
 
 
 

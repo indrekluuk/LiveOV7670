@@ -48,7 +48,7 @@ void processFrame() {
     lineBufferIndex = 0;
     lineBuffer[0] = 0; // first byte from Camera is half a pixel
 
-    for (uint16_t x = 1; x < lineLength*2+1; x+=4) {
+    for (uint16_t x = 1; x < lineLength*2+1; x+=5) {
       sendPixelByte(lineBuffer[lineBufferIndex]);
       lineBufferIndex++;
 
@@ -63,6 +63,9 @@ void processFrame() {
 
       camera.waitForPixelClockRisingEdge();
       lineBuffer[x+3] = camera.readPixelByte();
+
+      camera.waitForPixelClockRisingEdge();
+      lineBuffer[x+4] = camera.readPixelByte();
     }
 
     while (lineBufferIndex < lineLength * 2) {
