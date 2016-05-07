@@ -2,9 +2,9 @@
 // Created by indrek on 1.05.2016.
 //
 
-// set BUFFERED_CAMERA to 0 in setup.h to activate
+// set EXAMPLE to EXAMPLE_TFT_PIXEL_BY_PIXEL in setup.h to activate
 #include "setup.h"
-#if BUFFERED_CAMERA == 0
+#if EXAMPLE == 2
 
 
 #include "Arduino.h"

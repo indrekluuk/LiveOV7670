@@ -48,6 +48,7 @@ public:
 
   enum PixelFormat {
     PIXEL_RGB565,
+    PIXEL_BAYERRGB,
     PIXEL_YUV422
   };
 
@@ -62,6 +63,7 @@ private:
   static const int i2cAddress = 0x21;
   static const RegisterData regsDefault[];
   static const RegisterData regsRGB565[];
+  static const RegisterData regsBayerRGB[];
   static const RegisterData regsYUV422[];
   static const RegisterData regsQQVGA[];
   static const RegisterData regsQVGA[];

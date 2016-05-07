@@ -2,9 +2,9 @@
 // Created by indrek on 1.05.2016.
 //
 
-// set BUFFERED_CAMERA to 1 in setup.h to activate
+// set EXAMPLE to EXAMPLE_TFT_BUFFERED in setup.h to activate
 #include "setup.h"
-#if BUFFERED_CAMERA == 1
+#if EXAMPLE == 1
 
 
 

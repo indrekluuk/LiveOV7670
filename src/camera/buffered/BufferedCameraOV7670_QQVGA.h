@@ -16,7 +16,8 @@ public:
     FPS_5_Hz,
     FPS_3p33_Hz,
     FPS_2p5_Hz,
-    FPS_2_Hz
+    FPS_2_Hz,
+    FPS_1p66_Hz
   };
 
 
@@ -44,6 +45,8 @@ private:
         return 3;
       case FPS_2_Hz:
         return 4;
+      case FPS_1p66_Hz:
+        return 5;
     }
   }
 };

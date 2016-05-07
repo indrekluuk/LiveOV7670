@@ -7,18 +7,23 @@
 
 
 
+
 /*
- *  BUFFERED_CAMERA = 1
- *  Use camera class that reads line into buffer and then processes the data during blank lines
+ *  EXAMPLE = 1
+ *  Use camera class that reads line into buffer and
+ *  sends data to TFT over SPI during blank lines.
  *
- *  BUFFERED_CAMERA = 0
+ *  EXAMPLE = 2
  *  Use camera class that processes data pixel by pixel
+ *  sends data to TFT during each pixel reading loop.
  *  VGA can not be used with line buffer since there is no
  *  time (no blank lines) to do something useful with a buffered line
  *
+ *  EXAMPLE = 3
+ *  Reads data from camera and send it over UART to computer
+ *
  */
-
-#define BUFFERED_CAMERA 1
+#define EXAMPLE 3
 
 
 

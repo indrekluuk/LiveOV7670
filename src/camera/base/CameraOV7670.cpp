@@ -29,6 +29,9 @@ void CameraOV7670::setUpCamera() {
     case PIXEL_RGB565:
       setRegisters(regsRGB565);
       break;
+    case PIXEL_BAYERRGB:
+      setRegisters(regsBayerRGB);
+      break;
     case PIXEL_YUV422:
       setRegisters(regsYUV422);
       break;
