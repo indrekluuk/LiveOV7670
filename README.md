@@ -15,6 +15,8 @@ Compiling in Arduino IDE:
   
 -------------------------------------------------------------------------------
   
+https://raw.githubusercontent.com/indrekluuk/LiveOV7670/master/LiveOV7670.png
+
 OV7670 connections:  
   
 VSYNC - PIN2  
