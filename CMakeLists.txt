@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 3.2)
 project(LiveOV7670)
 
-include(CMakeListsPrivate.txt)
+# Use fake Arduino methods and definitions when building tests
+#set(OV7670_BUILD_FOR_TESTS true)
+if (OV7670_BUILD_FOR_TESTS)
+    include_directories(test/fake)
+else()
+    include(CMakeListsPrivate.txt)
+endif()
 
 add_definitions(-DF_CPU=16000000L)
 add_definitions(-DARDUINO_ARCH_AVR)
@@ -46,18 +52,5 @@ add_custom_target(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-add_executable(LiveOV7670
-        src/LiveOV7670.ino
-        src/camera/base/CameraOV7670.cpp
-        src/camera/base/CameraOV7670RegsDefault.cpp
-        src/camera/base/CameraOV7670RegsQQVGA.cpp
-        src/camera/base/CameraOV7670RegsQVGA.cpp
-        src/camera/base/CameraOV7670RegsVGA.cpp
-        src/camera/base/CameraOV7670RegsRGB565.cpp
-        src/camera/base/CameraOV7670RegsBayerRGB.cpp
-        src/camera/base/CameraOV7670RegsYUV422.cpp
-        src/screen/Adafruit_ST7735_mod.cpp
-        src/ExampleTftBufferedCameraFrame.cpp
-        src/ExampleTftPixelByPixelCameraFrame.cpp
-        src/ExampleUart.cpp
-        )
+add_subdirectory(src)
+add_subdirectory(test)
