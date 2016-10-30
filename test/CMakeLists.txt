@@ -11,6 +11,7 @@ add_subdirectory(fake)
 add_executable(runTests
         src/camera/base/TestCameraOV7670.cpp
         src/camera/base/TestCameraOV7670Registers.cpp
+        src/camera/buffered/TestBufferedCameraOV7670.cpp
         )
 
 target_link_libraries(runTests gtest_main)

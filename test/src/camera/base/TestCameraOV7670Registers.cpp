@@ -10,10 +10,9 @@
 
 
 class TestCameraOV7670Registers : public ::testing::Test {
-
 protected:
     virtual void SetUp() {
-      // re-init Wire to make sure it clean for each test
+      // re-init Wire to make sure it is clean for each test
       Wire = FakeWire();
     }
 

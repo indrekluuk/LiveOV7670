@@ -27,10 +27,13 @@ public:
 
     void setIsVsyncCallback(std::function<bool()> callback) {isVsyncCallback = callback;}
     void setIsPixelClockCallback(std::function<bool()> callback) {isPixelClockCallback = callback;}
+    void setGetPixelCallback(std::function<uint8_t ()> callback) {getPixelCallback = callback;}
 
 
+private:
     std::function<bool()> isVsyncCallback;
     std::function<bool()> isPixelClockCallback;
+    std::function<uint8_t()> getPixelCallback;
 
 };
 

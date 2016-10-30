@@ -21,7 +21,7 @@ bool OV7670Simulator::isPixelClock() {
 }
 
 uint8_t OV7670Simulator::getPixelByte() {
-  return 0;
+  return getPixelCallback ? getPixelCallback() : (uint8_t)0;
 }
 
 
