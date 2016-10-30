@@ -4,6 +4,7 @@ project(LiveOV7670)
 # Use fake Arduino methods and definitions when building tests
 #set(OV7670_BUILD_FOR_TESTS true)
 if (OV7670_BUILD_FOR_TESTS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     include_directories(test/fake)
 else()
     include(CMakeListsPrivate.txt)

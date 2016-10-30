@@ -5,5 +5,6 @@ project(LiveOV7670_fakeArduino)
 
 add_library(fakeArduino
         Arduino.cpp
-        Wire.cpp)
+        Wire.cpp
+        OV7670Simulator.cpp)
 
