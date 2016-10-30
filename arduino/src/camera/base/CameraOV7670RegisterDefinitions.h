@@ -125,6 +125,7 @@ struct RegisterData {
 #define REG_CMATRIX_SIGN0x58
 #define REG_BRIGHT	0x55	/* Brightness */
 #define REG_CONTRAS	0x56	/* Contrast control */
+#define REG_CONTRAST_CENTER	0x57	/* Contrast center */
 #define REG_GFIX	0x69	/* Fix gain control */
 #define REG_REG76	0x76	/* OV's name */
 #define R76_BLKPCOR	0x80	/* Black pixel correction enable */

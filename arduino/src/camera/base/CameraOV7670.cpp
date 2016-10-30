@@ -1,6 +1,6 @@
 
 #include "CameraOV7670.h"
-#include "CameraOV7670Registers.h"
+
 
 
 void CameraOV7670::init() {
@@ -21,7 +21,6 @@ void CameraOV7670::initClock() {
 
 
 void CameraOV7670::setUpCamera() {
-  CameraOV7670Registers registers(i2cAddress);
   registers.resetSettings();
   registers.setRegisters(CameraOV7670Registers::regsDefault);
 
@@ -54,6 +53,30 @@ void CameraOV7670::setUpCamera() {
   registers.setDisablePixelClockDuringBlankLines();
   registers.setInternalClockPreScaler(internalClockPreScaler);
 }
+
+
+
+void CameraOV7670::setManualContrastCenter(uint8_t contrastCenter) {
+  registers.setManualContrastCenter(contrastCenter);
+}
+
+
+void CameraOV7670::setContrast(uint8_t contrast) {
+  registers.setContrast(contrast);
+}
+
+
+void CameraOV7670::setBrightness(uint8_t birghtness) {
+  registers.setBrightness(birghtness);
+}
+
+
+void CameraOV7670::reversePixelBits() {
+  registers.reversePixelBits();
+}
+
+
+
 
 
 

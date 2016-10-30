@@ -28,17 +28,22 @@ public:
     static const RegisterData regsQVGA[];
     static const RegisterData regsVGA[];
 
-    CameraOV7670Registers(uint8_t i2cAddress) : i2cAddress(i2cAddress) {}
+    CameraOV7670Registers(const uint8_t i2cAddress) : i2cAddress(i2cAddress) {}
 
 
     void resetSettings();
     void setRegisters(const RegisterData *registerData);
     void setRegister(uint8_t addr, uint8_t val);
     uint8_t readRegister(uint8_t addr);
-    void addBitsToRegister(uint8_t addr, uint8_t bits);
+    void setRegisterBitsOR(uint8_t addr, uint8_t bits);
+    void setRegisterBitsAND(uint8_t addr, uint8_t bits);
 
     void setDisablePixelClockDuringBlankLines();
     void setInternalClockPreScaler(int preScaler);
+    void setManualContrastCenter(uint8_t center);
+    void setContrast(uint8_t contrast);
+    void setBrightness(uint8_t birghtness);
+    void reversePixelBits();
 
 };
 

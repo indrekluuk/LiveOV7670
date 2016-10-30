@@ -4,6 +4,7 @@
 #define _CAMERA_OV7670_h_
 
 #include "Arduino.h"
+#include "CameraOV7670Registers.h"
 
 
 /*
@@ -46,11 +47,12 @@ public:
 
 
 private:
-  static const int i2cAddress = 0x21;
+  static const uint8_t i2cAddress = 0x21;
 
   Resolution resolution;
   PixelFormat pixelFormat;
   uint8_t internalClockPreScaler;
+  CameraOV7670Registers registers;
 
 
 public:
@@ -58,9 +60,15 @@ public:
   CameraOV7670(Resolution resolution, PixelFormat format, uint8_t internalClockPreScaler) :
       resolution(resolution),
       pixelFormat(format),
-      internalClockPreScaler(internalClockPreScaler) {};
+      internalClockPreScaler(internalClockPreScaler),
+      registers(i2cAddress) {};
 
   void init();
+  void setManualContrastCenter(uint8_t center);
+  void setContrast(uint8_t contrast);
+  void setBrightness(uint8_t birghtness);
+  void reversePixelBits();
+
   inline void waitForVsync(void) __attribute__((always_inline));
   inline void waitForPixelClockRisingEdge(void) __attribute__((always_inline));
   inline void waitForPixelClockLow(void) __attribute__((always_inline));
