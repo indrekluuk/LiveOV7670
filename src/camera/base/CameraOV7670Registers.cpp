@@ -47,7 +47,7 @@ uint8_t CameraOV7670Registers::readRegister(uint8_t addr) {
   Wire.write(addr);
   Wire.endTransmission();
 
-  Wire.requestFrom(i2cAddress, 1);
+  Wire.requestFrom(i2cAddress, (uint8_t)1);
   return Wire.read();
 }
 
