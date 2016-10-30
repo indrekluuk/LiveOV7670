@@ -1,1 +1,7 @@
 .idea
+arduino/.idea
+arduino/.pioenvs
+arduino/.travis.yml
+arduino/CMakeLists.txt
+arduino/CMakeListsPrivate.txt
+arduino/platformio.ini
