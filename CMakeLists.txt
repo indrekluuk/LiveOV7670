@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 project(LiveOV7670)
 
 # Use fake Arduino methods and definitions when building tests
-set(OV7670_BUILD_FOR_TESTS true)
+#set(OV7670_BUILD_FOR_TESTS true)
 if (OV7670_BUILD_FOR_TESTS)
     include_directories(test/fake)
 else()
