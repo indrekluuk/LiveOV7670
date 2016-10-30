@@ -1,7 +1,8 @@
 
 Init CLion project with platformio:
 
-1. run
-platformio init --ide clion --board nanoatmega328
+1. cd to project root
+2. run
+platformio init -d arduino --ide clion --board nanoatmega328
+3. generated ".idea" folder in "arduino" can be deleted. CLion will create its own project file
 
-2. Restore CMakeLists.txt from git (to enable gtest)
