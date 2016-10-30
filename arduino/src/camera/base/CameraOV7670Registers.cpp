@@ -8,6 +8,12 @@
 
 
 
+CameraOV7670Registers::CameraOV7670Registers(const uint8_t i2cAddress) : i2cAddress(i2cAddress) {
+  Wire.begin();
+}
+
+
+
 void CameraOV7670Registers::resetSettings() {
   setRegister(REG_COM7, COM7_RESET);
   delay(500);

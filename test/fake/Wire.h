@@ -8,6 +8,7 @@
 
 #include "Arduino.h"
 #include <vector>
+#include <deque>
 
 
 class FakeWire {
@@ -15,6 +16,8 @@ class FakeWire {
 
 private:
     std::vector<uint8_t> transmittedBytes;
+    std::deque<uint8_t> bytesToRead;
+
 
 public:
     void begin();
@@ -24,9 +27,8 @@ public:
     void requestFrom(int, int);
     uint8_t read();
 
-
-public:
     const std::vector<uint8_t> & getTransmittedBytes();
+    void addBytesToRead(uint8_t byte);
 
 
 };

@@ -35,12 +35,23 @@ void FakeWire::requestFrom(int, int) {
 }
 
 uint8_t FakeWire::read() {
-  return 0;
+  if (bytesToRead.empty()) {
+    return 0;
+  } else {
+    uint8_t byte = bytesToRead.front();
+    bytesToRead.pop_front();
+    return byte;
+  }
 }
 
 
 const std::vector<uint8_t> & FakeWire::getTransmittedBytes() {
   return transmittedBytes;
+}
+
+
+void FakeWire::addBytesToRead(uint8_t byte) {
+  bytesToRead.push_back(byte);
 }
 
 
