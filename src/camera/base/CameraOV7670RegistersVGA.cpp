@@ -2,13 +2,13 @@
 // Created by indrek on 17.04.2016.
 //
 
-#include "CameraOV7670.h"
+#include "CameraOV7670Registers.h"
 
 
 /*
  * https://github.com/ComputerNerd/ov7670-no-ram-arduino-uno/blob/master/ov7670.c
  */
-const PROGMEM RegisterData CameraOV7670::regsVGA [] = {
+const PROGMEM RegisterData CameraOV7670Registers::regsVGA [] = {
     {REG_HREF,0xF6},	// was B6
     {0x17,0x13},		// HSTART
     {0x18,0x01},		// HSTOP

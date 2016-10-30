@@ -5,13 +5,14 @@ project(LiveOV7670_src)
 
 add_library(LiveOV7670_camera
         camera/base/CameraOV7670.cpp
-        camera/base/CameraOV7670RegsDefault.cpp
-        camera/base/CameraOV7670RegsQQVGA.cpp
-        camera/base/CameraOV7670RegsQVGA.cpp
-        camera/base/CameraOV7670RegsVGA.cpp
-        camera/base/CameraOV7670RegsRGB565.cpp
-        camera/base/CameraOV7670RegsBayerRGB.cpp
-        camera/base/CameraOV7670RegsYUV422.cpp
+        camera/base/CameraOV7670Registers.cpp
+        camera/base/CameraOV7670RegistersDefault.cpp
+        camera/base/CameraOV7670RegistersQQVGA.cpp
+        camera/base/CameraOV7670RegistersQVGA.cpp
+        camera/base/CameraOV7670RegistersVGA.cpp
+        camera/base/CameraOV7670RegistersRGB565.cpp
+        camera/base/CameraOV7670RegistersBayerRGB.cpp
+        camera/base/CameraOV7670RegistersYUV422.cpp
         )
 
 

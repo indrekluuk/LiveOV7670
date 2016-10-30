@@ -7,18 +7,27 @@
 
 
 #include "Arduino.h"
+#include <vector>
 
 
 class FakeWire {
 
 
+private:
+    std::vector<uint8_t> transmittedBytes;
+
 public:
-    void begin() {}
-    void beginTransmission(int) {}
-    void write(int) {}
-    void endTransmission() {}
-    void requestFrom(int, int) {}
-    uint8_t read() {return 0;}
+    void begin();
+    void beginTransmission(int);
+    void write(uint8_t byte);
+    void endTransmission();
+    void requestFrom(int, int);
+    uint8_t read();
+
+
+public:
+    const std::vector<uint8_t> & getTransmittedBytes();
+
 
 };
 

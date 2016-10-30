@@ -11,7 +11,7 @@
 
 
 
-TEST(BaseCameraOV7670Test, testWaitForVsync) {
+TEST(TestCameraOV7670, testWaitForVsync) {
   ov7670Simulator = OV7670Simulator();
   CameraOV7670 cameraOV7670(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_RGB565, 0);
 
@@ -31,7 +31,7 @@ TEST(BaseCameraOV7670Test, testWaitForVsync) {
 
 
 
-TEST(BaseCameraOV7670Test, testWaitForPixelClockRisingEdge) {
+TEST(TestCameraOV7670, testWaitForPixelClockRisingEdge) {
   ov7670Simulator = OV7670Simulator();
   CameraOV7670 cameraOV7670(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_RGB565, 0);
 
@@ -45,6 +45,9 @@ TEST(BaseCameraOV7670Test, testWaitForPixelClockRisingEdge) {
 
   EXPECT_EQ(14, pixelClockCheckCount);
 }
+
+
+
 
 
 

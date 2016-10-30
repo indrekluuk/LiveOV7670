@@ -37,7 +37,7 @@ extern uint8_t dummy;
 
 void pinMode(int, int);
 void delay(int);
-uint8_t pgm_read_byte(const uint8_t *);
+uint8_t pgm_read_byte(const uint8_t * pByte);
 
 
 #endif //LIVEOV7670_ARDUINO_H

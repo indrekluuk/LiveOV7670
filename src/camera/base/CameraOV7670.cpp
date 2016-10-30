@@ -1,6 +1,6 @@
 
 #include "CameraOV7670.h"
-
+#include "CameraOV7670Registers.h"
 
 
 void CameraOV7670::init() {
@@ -21,90 +21,39 @@ void CameraOV7670::initClock() {
 
 
 void CameraOV7670::setUpCamera() {
-  resetSettings();
-  setRegisters(regsDefault);
+  CameraOV7670Registers registers(i2cAddress);
+  registers.resetSettings();
+  registers.setRegisters(CameraOV7670Registers::regsDefault);
 
   switch (pixelFormat) {
     default:
     case PIXEL_RGB565:
-      setRegisters(regsRGB565);
+      registers.setRegisters(CameraOV7670Registers::regsRGB565);
       break;
     case PIXEL_BAYERRGB:
-      setRegisters(regsBayerRGB);
+      registers.setRegisters(CameraOV7670Registers::regsBayerRGB);
       break;
     case PIXEL_YUV422:
-      setRegisters(regsYUV422);
+      registers.setRegisters(CameraOV7670Registers::regsYUV422);
       break;
   }
 
   switch (resolution) {
     case RESOLUTION_VGA_640x480:
-      setRegisters(regsVGA);
+      registers.setRegisters(CameraOV7670Registers::regsVGA);
       break;
     case RESOLUTION_QVGA_320x240:
-      setRegisters(regsQVGA);
+      registers.setRegisters(CameraOV7670Registers::regsQVGA);
       break;
     default:
     case RESOLUTION_QQVGA_160x120:
-      setRegisters(regsQQVGA);
+      registers.setRegisters(CameraOV7670Registers::regsQQVGA);
       break;
   }
 
-
-  setRegister(REG_COM10, COM10_PCLK_HB); // disable pixel clock during blank lines
-  setRegister(REG_CLKRC, 0x80 | internalClockPreScaler); // f = input / (val + 1)
-
+  registers.setDisablePixelClockDuringBlankLines();
+  registers.setInternalClockPreScaler(internalClockPreScaler);
 }
-
-
-
-
-void CameraOV7670::resetSettings() {
-  setRegister(REG_COM7, COM7_RESET);
-  delay(500);
-}
-
-
-void CameraOV7670::setRegisters(const RegisterData *programMemPointer) {
-  while (true) {
-    RegisterData regData = {
-        addr: pgm_read_byte(&(programMemPointer->addr)),
-        val: pgm_read_byte(&(programMemPointer->val))
-    };
-    if (regData.addr == 0xFF) {
-      break;
-    } else {
-      setRegister(regData.addr, regData.val);
-      programMemPointer++;
-    }
-  }
-}
-
-void CameraOV7670::setRegister(uint8_t addr, uint8_t val) {
-  Wire.beginTransmission(i2cAddress);
-  Wire.write(addr);
-  Wire.write(val);
-  Wire.endTransmission();
-}
-
-
-
-uint8_t CameraOV7670::readRegister(uint8_t addr) {
-  Wire.beginTransmission(i2cAddress);
-  Wire.write(addr);
-  Wire.endTransmission();
-
-  Wire.requestFrom(i2cAddress, 1);
-  return Wire.read();
-}
-
-
-void CameraOV7670::addBitsToRegister(uint8_t addr, uint8_t bits) {
-  uint8_t val = readRegister(addr);
-  setRegister(addr, val | bits);
-}
-
-
 
 
 

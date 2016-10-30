@@ -4,9 +4,6 @@
 #define _CAMERA_OV7670_h_
 
 #include "Arduino.h"
-#include "Wire.h"
-#include "CameraOV7670RegisterDefinitions.h"
-
 
 
 /*
@@ -50,13 +47,6 @@ public:
 
 private:
   static const int i2cAddress = 0x21;
-  static const RegisterData regsDefault[];
-  static const RegisterData regsRGB565[];
-  static const RegisterData regsBayerRGB[];
-  static const RegisterData regsYUV422[];
-  static const RegisterData regsQQVGA[];
-  static const RegisterData regsQVGA[];
-  static const RegisterData regsVGA[];
 
   Resolution resolution;
   PixelFormat pixelFormat;
@@ -80,13 +70,7 @@ public:
 
 private:
   void initClock();
-  void resetSettings();
   void setUpCamera();
-  void setRegisters(const RegisterData *registerData);
-  void setRegister(uint8_t addr, uint8_t val);
-  uint8_t readRegister(uint8_t addr);
-  void addBitsToRegister(uint8_t addr, uint8_t bits);
-
 };
 
 

@@ -20,8 +20,8 @@ void delay(int) {
 }
 
 
-uint8_t pgm_read_byte(const uint8_t *) {
-  return 0;
+uint8_t pgm_read_byte(const uint8_t * pByte) {
+  return *pByte;
 }
 
 
