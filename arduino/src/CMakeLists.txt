@@ -16,12 +16,4 @@ add_library(LiveOV7670_camera
         )
 
 
-# Adding files to executable helps CLion to recognize source files as part of the project
-add_executable(LiveOV7670_main
-        LiveOV7670.ino
-        screen/Adafruit_ST7735_mod.cpp
-        ExampleTftBufferedCameraFrame.cpp
-        ExampleTftPixelByPixelCameraFrame.cpp
-        ExampleUart.cpp
-        )
 
