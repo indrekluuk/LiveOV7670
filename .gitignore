@@ -1,6 +1,7 @@
 .idea
 arduino/.idea
 arduino/.pioenvs
+arduino/.gitignore
 arduino/.travis.yml
 arduino/CMakeLists.txt
 arduino/CMakeListsPrivate.txt
