@@ -15,28 +15,17 @@ C (analog input pins)
 D (digital pins 0 to 7)
 */
 
-#ifndef OV7670_VSYNC_PIN_REG
-// PIN 2
-#define OV7670_VSYNC_PIN_REG PIND
-#define OV7670_VSYNC_MASK 0b00000100
+#ifndef OV7670_VSYNC
+#define OV7670_VSYNC (PIND & 0b00000100) // PIN 2
 #endif
 
-#ifndef OV7670_PCLOCK_PIN_REG
-// PIN 12
-#define OV7670_PCLOCK_PIN_REG PINB
-#define OV7670_PCLOCK_MASK 0b00010000
+#ifndef OV7670_PIXEL_CLOCK
+#define OV7670_PIXEL_CLOCK (PINB & 0b00010000) // PIN 12
 #endif
 
-#ifndef OV7670_LOW_4_BITS_PIN_REG
-// PIN A0..A3
-#define OV7670_LOW_4_BITS_PIN_REG PINC
-#define OV7670_LOW_4_BITS_MASK 0b00001111
-#endif
-
-#ifndef OV7670_HIGH_4_BITS_PIN_REG
-// PIN 4..7
-#define OV7670_HIGH_4_BITS_PIN_REG PIND
-#define OV7670_HIGH_4_BITS_MASK 0b11110000
+#ifndef OV7670_PIXEL_BYTE
+// (PIN 4..7) | (PIN A0..A3)
+#define OV7670_PIXEL_BYTE ((PIND & 0b11110000) | (PINC & 0b00001111))
 #endif
 
 
@@ -103,7 +92,7 @@ private:
 
 
 void CameraOV7670::waitForVsync() {
-  while(!(OV7670_VSYNC_PIN_REG & OV7670_VSYNC_MASK));
+  while(!OV7670_VSYNC);
 }
 
 void CameraOV7670::waitForPixelClockRisingEdge() {
@@ -112,16 +101,15 @@ void CameraOV7670::waitForPixelClockRisingEdge() {
 }
 
 void CameraOV7670::waitForPixelClockLow() {
-  while(OV7670_PCLOCK_PIN_REG & OV7670_PCLOCK_MASK);
+  while(OV7670_PIXEL_CLOCK);
 }
 
 void CameraOV7670::waitForPixelClockHigh() {
-  while(!(OV7670_PCLOCK_PIN_REG & OV7670_PCLOCK_MASK));
+  while(!OV7670_PIXEL_CLOCK);
 }
 
 uint8_t CameraOV7670::readPixelByte() {
-  return (OV7670_LOW_4_BITS_PIN_REG & OV7670_LOW_4_BITS_MASK)
-         | (OV7670_HIGH_4_BITS_PIN_REG & OV7670_HIGH_4_BITS_MASK);
+  return OV7670_PIXEL_BYTE;
 }
 
 
