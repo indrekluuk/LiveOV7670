@@ -30,6 +30,7 @@ public:
 
     CameraOV7670Registers(const uint8_t i2cAddress);
 
+    void init();
 
     void resetSettings();
     void setRegisters(const RegisterData *registerData);

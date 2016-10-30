@@ -4,6 +4,7 @@
 
 
 void CameraOV7670::init() {
+  registers.init();
   initClock();
   setUpCamera();
 }

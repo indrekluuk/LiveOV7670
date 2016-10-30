@@ -9,6 +9,11 @@
 
 
 CameraOV7670Registers::CameraOV7670Registers(const uint8_t i2cAddress) : i2cAddress(i2cAddress) {
+}
+
+
+
+void CameraOV7670Registers::init() {
   Wire.begin();
 }
 
