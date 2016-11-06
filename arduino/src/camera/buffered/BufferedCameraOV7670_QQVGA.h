@@ -9,7 +9,7 @@
 
 
 // 160 x 120 @ 5Hz or less
-class BufferedCameraOV7670_QQVGA : public BufferedCameraOV7670<160, 120> {
+class BufferedCameraOV7670_QQVGA : public BufferedCameraOV7670<uint16_t, 320, uint8_t, 160, uint8_t, 120> {
 
 public:
   enum FramesPerSecond {

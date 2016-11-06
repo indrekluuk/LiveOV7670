@@ -9,7 +9,7 @@
 
 
 // 320 x 240 @ 2.5Hz or less
-class BufferedCameraOV7670_QVGA : public BufferedCameraOV7670<320, 240> {
+class BufferedCameraOV7670_QVGA : public BufferedCameraOV7670<uint16_t, 640, uint16_t, 320, uint8_t, 240> {
 
 public:
   enum FramesPerSecond {

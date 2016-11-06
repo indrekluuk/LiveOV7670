@@ -9,7 +9,7 @@
 
 
 // 160 x 120 @ 10Hz
-class BufferedCameraOV7670_QQVGA_10hz : public BufferedCameraOV7670<160, 120> {
+class BufferedCameraOV7670_QQVGA_10hz : public BufferedCameraOV7670<uint16_t, 320, uint8_t, 160, uint8_t, 120> {
 
 
 public:

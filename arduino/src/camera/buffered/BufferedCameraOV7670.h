@@ -13,7 +13,7 @@
 // First byte from camera is half a pixel (lower byte of a pixel).
 // Shift line data by 1 byte to correct for it.
 // This means that first pixel in each line is actually broken.
-template <uint16_t size>
+template <typename TBuffer, TBuffer size>
 union OV7670PixelBuffer {
   struct {
     uint8_t writeBufferPadding;
@@ -28,14 +28,14 @@ union OV7670PixelBuffer {
 
 
 
-template <uint16_t x, uint16_t y>
+// TBuffer type for buffer size. If buffer is smaller than 256 then uin8_t can be used otherwise use uin16_t
+// Tx type for line length. If line length is smaller than 256 then uin8_t can be used otherwise use uin16_t
+// Ty type for line count. If line length is smaller than 256 then uin8_t can be used otherwise use uin16_t
+template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
 class BufferedCameraOV7670 : public CameraOV7670 {
 
 protected:
-  static const uint16_t lineLength = x;
-  static const uint16_t lineCount = y;
-  static const uint16_t pixelBufferLength = x*2;
-  static OV7670PixelBuffer<x*2> pixelBuffer;
+  static OV7670PixelBuffer<TBuffer, bufferLength> pixelBuffer;
 
 public:
   BufferedCameraOV7670(Resolution resolution, PixelFormat format, uint8_t internalClockPreScaler) :
@@ -43,50 +43,58 @@ public:
 
   virtual inline void readLine() __attribute__((always_inline));
 
-  inline uint16_t getLineLength() __attribute__((always_inline));
-  inline uint16_t getLineCount() __attribute__((always_inline));
-  inline uint16_t getPixelBufferLength() __attribute__((always_inline));
-  inline uint8_t getPixelByte(uint16_t byteIndex) __attribute__((always_inline));
+  inline const Tx getLineLength() __attribute__((always_inline));
+  inline const Ty getLineCount() __attribute__((always_inline));
+  inline const uint8_t * getPixelBuffer() __attribute__((always_inline));
+  inline const TBuffer getPixelBufferLength() __attribute__((always_inline));
+  inline const uint8_t getPixelByte(TBuffer byteIndex) __attribute__((always_inline));
 
 
 };
 
 
 
-template <uint16_t x, uint16_t y>
-OV7670PixelBuffer<x*2> BufferedCameraOV7670<x, y>::pixelBuffer;
+template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
+OV7670PixelBuffer<TBuffer, bufferLength> BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::pixelBuffer;
 
 
 
 
-template <uint16_t x, uint16_t y>
-uint16_t BufferedCameraOV7670<x, y>::getLineLength() {
+template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
+const Tx BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::getLineLength() {
   return lineLength;
 }
 
-template <uint16_t x, uint16_t y>
-uint16_t BufferedCameraOV7670<x, y>::getLineCount() {
+
+template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
+const Ty BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::getLineCount() {
   return lineCount;
 }
 
-template <uint16_t x, uint16_t y>
-uint16_t BufferedCameraOV7670<x, y>::getPixelBufferLength() {
-  return pixelBufferLength;
+
+template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
+const uint8_t * BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::getPixelBuffer() {
+  return pixelBuffer.readBuffer;
+};
+
+
+template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
+const TBuffer BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::getPixelBufferLength() {
+  return bufferLength;
 }
 
-template <uint16_t x, uint16_t y>
-uint8_t BufferedCameraOV7670<x, y>::getPixelByte(uint16_t byteIndex) {
+
+template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
+const uint8_t BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::getPixelByte(const TBuffer byteIndex) {
   return pixelBuffer.readBuffer[byteIndex];
 }
 
 
-
-
-template <uint16_t x, uint16_t y>
-void BufferedCameraOV7670<x, y>::readLine() {
+template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
+void BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::readLine() {
 
   pixelBuffer.writeBufferPadding = 0;
-  uint16_t bufferIndex = 0;
+  TBuffer bufferIndex = 0;
 
   while (bufferIndex < getPixelBufferLength()) {
     waitForPixelClockRisingEdge();
