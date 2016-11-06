@@ -73,10 +73,11 @@ void BufferedCameraOV7670_QQVGA_10hz_Grayscale::readPixels_unrolled_x10(uint16_t
 
 void BufferedCameraOV7670_QQVGA_10hz_Grayscale::readPixel_unrolled(uint16_t byteIndex) {
   asm volatile("nop");
-  pixelBuffer.writeBuffer[byteIndex] = readPixelByte();
+  pixelBuffer.readBuffer[byteIndex] = readPixelByte();
   asm volatile("nop");
-  // for grayscale we are only interested in the second byte
-  pixelBuffer.writeBuffer[byteIndex] = readPixelByte();
+  // For grayscale we are only interested in the second byte
+  // Since we do not need the first byte the buffer shift is not necessary and we can write directly to readBuffer
+  pixelBuffer.readBuffer[byteIndex] = readPixelByte();
 }
 
 

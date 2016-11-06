@@ -60,14 +60,12 @@ void validateColorBuffer(BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLen
 template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
 void validateGrayscaleBuffer(BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount> & camera) {
   ASSERT_EQ(lineLength, camera.getLineLength());
-  // pixel order in the buffer is HIGH_1, LOW_1, HIGH_2, LOW_2, HIGH_3, LOW_3 ...
-  // when camera sends data it starts with LOW_1 instead on HIGH_1
   // For grayscale every other byte is saved
-  ASSERT_EQ(0, camera.getPixelByte(0));
-  ASSERT_EQ(PIXEL_VALUE_START+1, camera.getPixelByte(1));
-  ASSERT_EQ(PIXEL_VALUE_START+3, camera.getPixelByte(2));
-  ASSERT_EQ(PIXEL_VALUE_START+5, camera.getPixelByte(3));
-  ASSERT_EQ((lineLength*2)%(PIXEL_VALUE_END+1-PIXEL_VALUE_START)+PIXEL_VALUE_START-3, camera.getPixelByte(lineLength-1));
+  ASSERT_EQ(PIXEL_VALUE_START+1, camera.getPixelByte(0));
+  ASSERT_EQ(PIXEL_VALUE_START+3, camera.getPixelByte(1));
+  ASSERT_EQ(PIXEL_VALUE_START+5, camera.getPixelByte(2));
+  ASSERT_EQ(PIXEL_VALUE_START+7, camera.getPixelByte(3));
+  ASSERT_EQ((lineLength*2)%(PIXEL_VALUE_END+1-PIXEL_VALUE_START)+PIXEL_VALUE_START-1, camera.getPixelByte(lineLength-1));
 };
 
 
