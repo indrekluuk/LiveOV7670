@@ -10,6 +10,7 @@
 #include "camera/buffered/BufferedCameraOV7670_QQVGA.h"
 #include "camera/buffered/BufferedCameraOV7670_QQVGA_10hz.h"
 #include "camera/buffered/BufferedCameraOV7670_QQVGA_10hz_Grayscale.h"
+#include "camera/buffered/BufferedCameraOV7670_80x120_10hz_Grayscale.h"
 
 
 
@@ -57,20 +58,6 @@ void validateColorBuffer(BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLen
 
 
 
-template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
-void validateGrayscaleBuffer(BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount> & camera) {
-  ASSERT_EQ(lineLength, camera.getLineLength());
-  // For grayscale every other byte is saved
-  ASSERT_EQ(PIXEL_VALUE_START+1, camera.getPixelByte(0));
-  ASSERT_EQ(PIXEL_VALUE_START+3, camera.getPixelByte(1));
-  ASSERT_EQ(PIXEL_VALUE_START+5, camera.getPixelByte(2));
-  ASSERT_EQ(PIXEL_VALUE_START+7, camera.getPixelByte(3));
-  ASSERT_EQ((lineLength*2)%(PIXEL_VALUE_END+1-PIXEL_VALUE_START)+PIXEL_VALUE_START-1, camera.getPixelByte(lineLength-1));
-};
-
-
-
-
 TEST(TestBufferedCameraOV7670, testQVGA_minFps) {
   BufferedCameraOV7670_QVGA camera(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QVGA::FPS_1p25_Hz);
   testBufferedCameraOV7670<uint16_t, 640, uint16_t, 320, uint8_t, 240>(camera);
@@ -104,9 +91,30 @@ TEST(TestBufferedCameraOV7670, testQQVGA_FPS_10_Hz) {
 TEST(TestBufferedCameraOV7670, testQQVGA_FPS_10_Hz_Grayscale) {
   BufferedCameraOV7670_QQVGA_10hz_Grayscale camera;
   testBufferedCameraOV7670<uint8_t, 160, uint8_t, 160, uint8_t, 120>(camera);
-  validateGrayscaleBuffer<uint8_t, 160, uint8_t, 160, uint8_t, 120>(camera);
+
+  uint8_t lineLength = 160;
+  ASSERT_EQ(lineLength, camera.getLineLength());
+  // For grayscale every other byte is saved
+  ASSERT_EQ(PIXEL_VALUE_START+1, camera.getPixelByte(0));
+  ASSERT_EQ(PIXEL_VALUE_START+3, camera.getPixelByte(1));
+  ASSERT_EQ(PIXEL_VALUE_START+5, camera.getPixelByte(2));
+  ASSERT_EQ(PIXEL_VALUE_START+7, camera.getPixelByte(3));
+  ASSERT_EQ((lineLength*2)%(PIXEL_VALUE_END+1-PIXEL_VALUE_START)+PIXEL_VALUE_START-1, camera.getPixelByte(lineLength-1));
 }
 
+TEST(TestBufferedCameraOV7670, test80x120_FPS_10_Hz_Grayscale) {
+  BufferedCameraOV7670_80x120_10hz_Grayscale camera;
+  testBufferedCameraOV7670<uint8_t, 80, uint8_t, 80, uint8_t, 120>(camera);
+
+  uint8_t lineLength = 80;
+  ASSERT_EQ(lineLength, camera.getLineLength());
+  // For grayscale every other byte is saved
+  ASSERT_EQ(PIXEL_VALUE_START+3, camera.getPixelByte(0));
+  ASSERT_EQ(PIXEL_VALUE_START+7, camera.getPixelByte(1));
+  ASSERT_EQ(PIXEL_VALUE_START+11, camera.getPixelByte(2));
+  ASSERT_EQ(PIXEL_VALUE_START+15, camera.getPixelByte(3));
+  ASSERT_EQ((lineLength*4)%(PIXEL_VALUE_END+1-PIXEL_VALUE_START)+PIXEL_VALUE_START-1, camera.getPixelByte(lineLength-1));
+}
 
 
 
