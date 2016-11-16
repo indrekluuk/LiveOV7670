@@ -43,10 +43,10 @@ public:
 
   virtual inline void readLine() __attribute__((always_inline));
 
-  inline const Tx getLineLength() __attribute__((always_inline));
-  inline const Ty getLineCount() __attribute__((always_inline));
+  inline static constexpr Tx getLineLength() __attribute__((always_inline));
+  inline static constexpr Ty getLineCount() __attribute__((always_inline));
   inline const uint8_t * getPixelBuffer() __attribute__((always_inline));
-  inline const TBuffer getPixelBufferLength() __attribute__((always_inline));
+  inline static constexpr TBuffer getPixelBufferLength() __attribute__((always_inline));
   inline const uint8_t getPixelByte(TBuffer byteIndex) __attribute__((always_inline));
 
 
@@ -61,13 +61,13 @@ OV7670PixelBuffer<TBuffer, bufferLength> BufferedCameraOV7670<TBuffer, bufferLen
 
 
 template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
-const Tx BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::getLineLength() {
+constexpr Tx BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::getLineLength() {
   return lineLength;
 }
 
 
 template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
-const Ty BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::getLineCount() {
+constexpr Ty BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::getLineCount() {
   return lineCount;
 }
 
@@ -79,7 +79,7 @@ const uint8_t * BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, 
 
 
 template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, typename Ty, Ty lineCount>
-const TBuffer BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::getPixelBufferLength() {
+constexpr TBuffer BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>::getPixelBufferLength() {
   return bufferLength;
 }
 
