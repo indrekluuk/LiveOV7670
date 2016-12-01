@@ -41,6 +41,8 @@ void BufferedCameraOV7670_80x120_10hz_Grayscale::readLine() {
     asm volatile("nop");
     asm volatile("nop");
     asm volatile("nop");
+    // For grayscale we are only interested in the second byte
+    // Since we do not need the first byte the buffer shift is not necessary and we can write directly to readBuffer
     pixelBuffer.readBuffer[i] = readPixelByte();
   }
 }
