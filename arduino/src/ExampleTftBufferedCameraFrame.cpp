@@ -13,13 +13,22 @@
 #include "camera/buffered/BufferedCameraOV7670_QQVGA_10hz.h"
 #include "camera/buffered/BufferedCameraOV7670_QQVGA.h"
 #include "camera/buffered/BufferedCameraOV7670_QVGA.h"
+#include "camera/buffered/BufferedCameraOV7670_QQVGA_10hz_Grayscale.h"
+#include "screen/GrayScaleTable.h"
 
 
 
+#define GRAYSCALE_PIXELS 0
 
+#if GRAYSCALE_PIXELS == 1
+BufferedCameraOV7670_QQVGA_10hz_Grayscale camera;
+#else
 BufferedCameraOV7670_QQVGA_10hz camera(CameraOV7670::PIXEL_RGB565);
 //BufferedCameraOV7670_QQVGA camera(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QQVGA::FPS_2_Hz);
 //BufferedCameraOV7670_QVGA camera(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QVGA::FPS_2p5_Hz);
+#endif
+
+
 
 
 int TFT_RST = 10;
@@ -81,9 +90,16 @@ void sendLineToDisplay() {
   if (screenLineIndex > 0) {
 
     screenLineStart();
+#if GRAYSCALE_PIXELS == 1
+    for (uint16_t i=0; i<camera.getLineLength(); i++) {
+      sendPixelByte(graysScaleTableHigh[camera.getPixelByte(i)]);
+      sendPixelByte(graysScaleTableLow[camera.getPixelByte(i)]);
+    }
+#else
     for (uint16_t i=0; i<byteCountForDisplay; i++) {
       sendPixelByte(camera.getPixelByte(i));
     }
+#endif
     screenLineEnd();
   }
 }
@@ -108,15 +124,17 @@ void sendPixelByte(uint8_t byte) {
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
-  /*
+  asm volatile("nop");
+
+#if GRAYSCALE_PIXELS == 1
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
   asm volatile("nop");
-  asm volatile("nop");
-  */
+#endif
+
 }
 
 
