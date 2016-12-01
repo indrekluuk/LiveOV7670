@@ -33,6 +33,7 @@ void BufferedCameraOV7670_QQVGA_10hz_Grayscale::readLine() {
   waitForPixelClockLow();
 
   // only way to get line data at 10Hz is to unroll pixel reading
+  // todo check if this can be done with for cycle
   readPixels_unrolled_x160(0);
 }
 
