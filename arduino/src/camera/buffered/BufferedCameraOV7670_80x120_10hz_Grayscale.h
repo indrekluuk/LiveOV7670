@@ -15,13 +15,13 @@ class BufferedCameraOV7670_80x120_10hz_Grayscale : public BufferedCameraOV7670<u
 public:
     BufferedCameraOV7670_80x120_10hz_Grayscale() : BufferedCameraOV7670(Resolution::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_YUV422, 0) {};
 
-  inline void readLine() override __attribute__((always_inline));
+    inline void readLine() override __attribute__((always_inline));
 
 
 private:
-  inline void readPixels_unrolled_x80(uint16_t byteIndex) __attribute__((always_inline));
-  inline void readPixels_unrolled_x10(uint16_t byteIndex) __attribute__((always_inline));
-  inline void readPixel_unrolled(uint16_t byteIndex) __attribute__((always_inline));
+    inline void readPixels_unrolled_x80(uint16_t byteIndex) __attribute__((always_inline));
+    inline void readPixels_unrolled_x10(uint16_t byteIndex) __attribute__((always_inline));
+    inline void readPixel_unrolled(uint16_t byteIndex) __attribute__((always_inline));
 
 };
 
@@ -36,13 +36,30 @@ void BufferedCameraOV7670_80x120_10hz_Grayscale::readLine() {
   asm volatile("nop");
   asm volatile("nop");
 
+
   for (uint8_t i = 0; i<80; i++) {
+
     asm volatile("nop");
     asm volatile("nop");
     asm volatile("nop");
     asm volatile("nop");
-    // For grayscale we are only interested in the second byte
-    // Since we do not need the first byte the buffer shift is not necessary and we can write directly to readBuffer
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+    asm volatile("nop");
+
     pixelBuffer.readBuffer[i] = readPixelByte();
   }
 }
