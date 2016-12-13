@@ -7,10 +7,12 @@
 #include "CameraOV7670Registers.h"
 
 
+// Arduino
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
 /*
-B (digital pin 8 to 13)
-C (analog input pins)
-D (digital pins 0 to 7)
+  B (digital pin 8 to 13)
+  C (analog input pins)
+  D (digital pins 0 to 7)
 */
 
 #ifndef OV7670_VSYNC
@@ -25,6 +27,50 @@ D (digital pins 0 to 7)
 // (PIN 4..7) | (PIN A0..A3)
 #define OV7670_PIXEL_BYTE ((PIND & 0b11110000) | (PINC & 0b00001111))
 #endif
+
+// pin 3 to 8Mhz (camera clock)
+#ifndef OV7670_INIT_CLOCK_OUT
+#define OV7670_INIT_CLOCK_OUT \
+                    pinMode(3, OUTPUT); \
+                    TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM21) | _BV(WGM20); \
+                    TCCR2B = _BV(WGM22) | _BV(CS20); \
+                    OCR2A = 1; \
+                    OCR2B = 0
+#endif
+
+#endif
+
+
+
+
+// STM32
+#ifdef _VARIANT_ARDUINO_STM32_
+
+// vsync - PB5
+#ifndef OV7670_VSYNC
+#define OV7670_VSYNC ((*GPIOB_BASE).IDR & 0x0020)
+#endif
+
+// pixel clock - PB4
+#ifndef OV7670_PIXEL_CLOCK
+#define OV7670_PIXEL_CLOCK ((*GPIOB_BASE).IDR & 0x0010)
+#endif
+
+// pixel byte - PB8..PB15
+#ifndef OV7670_PIXEL_BYTE
+#define OV7670_PIXEL_BYTE ((uint8_t*)(&(*GPIOB_BASE).IDR))[1]
+#endif
+
+// configure PA8 to output PLL/2 clock
+#ifndef OV7670_INIT_CLOCK_OUT
+#define OV7670_INIT_CLOCK_OUT \
+                    gpio_set_mode(GPIOA, 8, GPIO_AF_OUTPUT_PP); \
+                    *(volatile uint8_t *)(0x40021007) = 0x7
+#endif
+
+#endif
+
+
 
 
 
