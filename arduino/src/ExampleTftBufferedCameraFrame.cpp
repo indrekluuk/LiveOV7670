@@ -21,11 +21,11 @@
 #define GRAYSCALE_PIXELS 0
 
 #if GRAYSCALE_PIXELS == 1
-BufferedCameraOV7670_QQVGA_10hz_Grayscale LiveOV7670;
+BufferedCameraOV7670_QQVGA_10hz_Grayscale LiveOV7670Library;
 #else
 BufferedCameraOV7670_QQVGA_10hz camera(CameraOV7670::PIXEL_RGB565);
-//BufferedCameraOV7670_QQVGA LiveOV7670(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QQVGA::FPS_2_Hz);
-//BufferedCameraOV7670_QVGA LiveOV7670(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QVGA::FPS_2p5_Hz);
+//BufferedCameraOV7670_QQVGA LiveOV7670Library(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QQVGA::FPS_2_Hz);
+//BufferedCameraOV7670_QVGA LiveOV7670Library(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QVGA::FPS_2p5_Hz);
 #endif
 
 
@@ -91,9 +91,9 @@ void sendLineToDisplay() {
 
     screenLineStart();
 #if GRAYSCALE_PIXELS == 1
-    for (uint16_t i=0; i<LiveOV7670.getLineLength(); i++) {
-      sendPixelByte(graysScaleTableHigh[LiveOV7670.getPixelByte(i)]);
-      sendPixelByte(graysScaleTableLow[LiveOV7670.getPixelByte(i)]);
+    for (uint16_t i=0; i<LiveOV7670Library.getLineLength(); i++) {
+      sendPixelByte(graysScaleTableHigh[LiveOV7670Library.getPixelByte(i)]);
+      sendPixelByte(graysScaleTableLow[LiveOV7670Library.getPixelByte(i)]);
     }
 #else
     for (uint16_t i=0; i<byteCountForDisplay; i++) {

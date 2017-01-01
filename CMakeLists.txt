@@ -27,15 +27,15 @@ add_executable(runTests
         test/fake/Wire.cpp
         test/fake/OV7670Simulator.cpp
 
-        arduino/lib/LiveOV7670/CameraOV7670.cpp
-        arduino/lib/LiveOV7670/CameraOV7670Registers.cpp
-        arduino/lib/LiveOV7670/CameraOV7670RegistersDefault.cpp
-        arduino/lib/LiveOV7670/CameraOV7670RegistersQQVGA.cpp
-        arduino/lib/LiveOV7670/CameraOV7670RegistersQVGA.cpp
-        arduino/lib/LiveOV7670/CameraOV7670RegistersVGA.cpp
-        arduino/lib/LiveOV7670/CameraOV7670RegistersRGB565.cpp
-        arduino/lib/LiveOV7670/CameraOV7670RegistersBayerRGB.cpp
-        arduino/lib/LiveOV7670/CameraOV7670RegistersYUV422.cpp
+        arduino/lib/LiveOV7670Library/CameraOV7670.cpp
+        arduino/lib/LiveOV7670Library/CameraOV7670Registers.cpp
+        arduino/lib/LiveOV7670Library/CameraOV7670RegistersDefault.cpp
+        arduino/lib/LiveOV7670Library/CameraOV7670RegistersQQVGA.cpp
+        arduino/lib/LiveOV7670Library/CameraOV7670RegistersQVGA.cpp
+        arduino/lib/LiveOV7670Library/CameraOV7670RegistersVGA.cpp
+        arduino/lib/LiveOV7670Library/CameraOV7670RegistersRGB565.cpp
+        arduino/lib/LiveOV7670Library/CameraOV7670RegistersBayerRGB.cpp
+        arduino/lib/LiveOV7670Library/CameraOV7670RegistersYUV422.cpp
 
         test/src/camera/base/TestCameraOV7670.cpp
         test/src/camera/base/TestCameraOV7670Registers.cpp

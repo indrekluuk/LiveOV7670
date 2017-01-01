@@ -10,17 +10,17 @@
 
 /*
  *  EXAMPLE = 1
- *  Use LiveOV7670 class that reads line into buffer and
+ *  Use LiveOV7670Library class that reads line into buffer and
  *  sends data to TFT over SPI during blank lines.
  *
  *  EXAMPLE = 2
- *  Use LiveOV7670 class that processes data pixel by pixel
+ *  Use LiveOV7670Library class that processes data pixel by pixel
  *  sends data to TFT during each pixel reading loop.
  *  VGA can not be used with line buffer since there is no
  *  time (no blank lines) to do something useful with a buffered line
  *
  *  EXAMPLE = 3
- *  Reads data from LiveOV7670 and send it over UART to computer
+ *  Reads data from LiveOV7670Library and send it over UART to computer
  *  Java application for receiving picture from UART
  *  https://github.com/indrekluuk/ArduinoImageCapture/tree/master/ArduinoImageCapture
  *

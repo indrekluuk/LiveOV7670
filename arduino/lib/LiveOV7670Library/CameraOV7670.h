@@ -28,7 +28,7 @@
 #define OV7670_PIXEL_BYTE ((PIND & 0b11110000) | (PINC & 0b00001111))
 #endif
 
-// pin 3 to 8Mhz (LiveOV7670 clock)
+// pin 3 to 8Mhz (LiveOV7670Library clock)
 #ifndef OV7670_INIT_CLOCK_OUT
 #define OV7670_INIT_CLOCK_OUT \
                     pinMode(3, OUTPUT); \

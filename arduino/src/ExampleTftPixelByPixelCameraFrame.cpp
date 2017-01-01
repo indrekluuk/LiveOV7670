@@ -24,7 +24,7 @@ static const uint16_t lineCount = 480;
 
 
 // Since the 1.8" TFT screen is only 160x128 only top right corner of the VGA picture is visible.
-CameraOV7670 LiveOV7670(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_RGB565, FPS_1_Hz);
+CameraOV7670 LiveOV7670Library(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_RGB565, FPS_1_Hz);
 
 
 
@@ -39,7 +39,7 @@ Adafruit_ST7735_mod tft = Adafruit_ST7735_mod(TFT_CS, TFT_DC, TFT_RST);
 
 // this is called in Arduino setup() function
 void initializeScreenAndCamera() {
-  LiveOV7670.init();
+  LiveOV7670Library.init();
   tft.initR(INITR_BLACKTAB);
   tft.fillScreen(ST7735_BLACK);
   noInterrupts();
@@ -68,7 +68,7 @@ uint8_t screenLineIndex;
 void processFrame() {
   screenLineIndex = screen_h;
 
-  LiveOV7670.waitForVsync();
+  LiveOV7670Library.waitForVsync();
 
   uint8_t lowByte = 0;
   uint8_t bufferedLowByte = 0;
@@ -77,26 +77,26 @@ void processFrame() {
 
     screenLineStart();
 
-    // For full VGA resolution byte order from LiveOV7670 is low1, high1, low2, high2
+    // For full VGA resolution byte order from LiveOV7670Library is low1, high1, low2, high2
     // We have to swap byte order for the screen.
 
-    LiveOV7670.waitForPixelClockRisingEdge();
-    bufferedLowByte = LiveOV7670.readPixelByte();
+    LiveOV7670Library.waitForPixelClockRisingEdge();
+    bufferedLowByte = LiveOV7670Library.readPixelByte();
 
     for (uint16_t x = 0; x < lineLength-1; x++) {
 
-      LiveOV7670.waitForPixelClockRisingEdge();
-      sendPixelByte(LiveOV7670.readPixelByte()); // send pixel high byte
+      LiveOV7670Library.waitForPixelClockRisingEdge();
+      sendPixelByte(LiveOV7670Library.readPixelByte()); // send pixel high byte
 
       lowByte = bufferedLowByte;
-      LiveOV7670.waitForPixelClockRisingEdge();
-      bufferedLowByte = LiveOV7670.readPixelByte();
+      LiveOV7670Library.waitForPixelClockRisingEdge();
+      bufferedLowByte = LiveOV7670Library.readPixelByte();
       sendPixelByte(lowByte); // send pixel low byte
     }
 
     // send last pixel
-    LiveOV7670.waitForPixelClockRisingEdge();
-    sendPixelByte(LiveOV7670.readPixelByte()); // send pixel high byte
+    LiveOV7670Library.waitForPixelClockRisingEdge();
+    sendPixelByte(LiveOV7670Library.readPixelByte()); // send pixel high byte
     pixelSendingDelay(); // prevent sending collision
     sendPixelByte(bufferedLowByte); // send pixel low byte
     pixelSendingDelay();
