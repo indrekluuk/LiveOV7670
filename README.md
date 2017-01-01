@@ -8,7 +8,7 @@ https://www.youtube.com/watch?v=TqSY6FETuos
 Compiling in Arduino IDE:  
   
 1. Download all files  
-2. copy "arduino/lib/LiveOV7670" and "arduino/lib/Adafruit_GFX_Library" to Arduino "libraries" folder (If you already have "Adafruit_GFX_Library" then you don't have to copy that)
+2. copy "arduino/lib/LiveOV7670Library" and "arduino/lib/Adafruit_GFX_Library" to Arduino "libraries" folder (If you already have "Adafruit_GFX_Library" then you don't have to copy that)
 3. Rename "arduino/src" folder to "LiveOV7670"
 4. Open "LiveOV7670.ino" in Arduino IDE
 5. Select Tools->Board->Arduino Nano
