@@ -5,12 +5,12 @@
 #ifndef _CAMERAOV7670LINEBUFFER_H
 #define _CAMERAOV7670LINEBUFFER_H
 
-#include "../base/CameraOV7670.h"
+#include "../CameraOV7670.h"
 
 
 
-// Pixel receiving order from camera for downsampled pictures: Pixel_1_H, Pixel_1_L, Pixel_2_H, Pixel_2_L ...
-// First byte from camera is half a pixel (lower byte of a pixel).
+// Pixel receiving order from LiveOV7670 for downsampled pictures: Pixel_1_H, Pixel_1_L, Pixel_2_H, Pixel_2_L ...
+// First byte from LiveOV7670 is half a pixel (lower byte of a pixel).
 // Shift line data by 1 byte to correct for it.
 // This means that first pixel in each line is actually broken.
 template <typename TBuffer, TBuffer size>

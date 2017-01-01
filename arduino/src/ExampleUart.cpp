@@ -8,7 +8,7 @@
 
 
 #include "Arduino.h"
-#include "camera/base/CameraOV7670.h"
+#include "LiveOV7670/base/CameraOV7670.h"
 
 
 static const uint16_t lineLength = 160;
@@ -16,7 +16,7 @@ static const uint16_t lineCount = 120;
 
 
 CameraOV7670::PixelFormat pixelFormat = CameraOV7670::PIXEL_RGB565;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 4);
+CameraOV7670 LiveOV7670(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 4);
 
 
 
@@ -24,7 +24,7 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 4);
 // this is called in Arduino setup() function
 void initializeScreenAndCamera() {
   Serial.begin(1000000); // 2000000 is unreliable
-  camera.init();
+  LiveOV7670.init();
   noInterrupts();
 }
 
@@ -42,7 +42,7 @@ uint16_t lineBufferIndex = 0;
 
 // this is called in Arduino loop() function
 void processFrame() {
-  camera.waitForVsync();
+  LiveOV7670.waitForVsync();
 
   for (uint16_t y = 0; y < lineCount; y++) {
     lineBufferIndex = 0;
@@ -52,20 +52,20 @@ void processFrame() {
       sendPixelByte(lineBuffer[lineBufferIndex]);
       lineBufferIndex++;
 
-      camera.waitForPixelClockRisingEdge();
-      lineBuffer[x] = camera.readPixelByte();
+      LiveOV7670.waitForPixelClockRisingEdge();
+      lineBuffer[x] = LiveOV7670.readPixelByte();
 
-      camera.waitForPixelClockRisingEdge();
-      lineBuffer[x+1] = camera.readPixelByte();
+      LiveOV7670.waitForPixelClockRisingEdge();
+      lineBuffer[x+1] = LiveOV7670.readPixelByte();
 
-      camera.waitForPixelClockRisingEdge();
-      lineBuffer[x+2] = camera.readPixelByte();
+      LiveOV7670.waitForPixelClockRisingEdge();
+      lineBuffer[x+2] = LiveOV7670.readPixelByte();
 
-      camera.waitForPixelClockRisingEdge();
-      lineBuffer[x+3] = camera.readPixelByte();
+      LiveOV7670.waitForPixelClockRisingEdge();
+      lineBuffer[x+3] = LiveOV7670.readPixelByte();
 
-      camera.waitForPixelClockRisingEdge();
-      lineBuffer[x+4] = camera.readPixelByte();
+      LiveOV7670.waitForPixelClockRisingEdge();
+      lineBuffer[x+4] = LiveOV7670.readPixelByte();
     }
 
     while (lineBufferIndex < lineLength * 2) {

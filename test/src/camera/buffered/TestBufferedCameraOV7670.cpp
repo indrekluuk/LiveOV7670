@@ -6,11 +6,11 @@
 
 #include "gtest/gtest.h"
 #include "OV7670Simulator.h"
-#include "camera/buffered/BufferedCameraOV7670_QVGA.h"
-#include "camera/buffered/BufferedCameraOV7670_QQVGA.h"
-#include "camera/buffered/BufferedCameraOV7670_QQVGA_10hz.h"
-#include "camera/buffered/BufferedCameraOV7670_QQVGA_10hz_Grayscale.h"
-#include "camera/buffered/BufferedCameraOV7670_80x120_10hz_Grayscale.h"
+#include "LiveOV7670/buffered/BufferedCameraOV7670_QVGA.h"
+#include "LiveOV7670/buffered/BufferedCameraOV7670_QQVGA.h"
+#include "LiveOV7670/buffered/BufferedCameraOV7670_QQVGA_10hz.h"
+#include "LiveOV7670/buffered/BufferedCameraOV7670_QQVGA_10hz_Grayscale.h"
+#include "LiveOV7670/buffered/BufferedCameraOV7670_80x120_10hz_Grayscale.h"
 
 
 
@@ -47,7 +47,7 @@ template <typename TBuffer, TBuffer bufferLength, typename Tx, Tx lineLength, ty
 void validateColorBuffer(BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount> & camera) {
   ASSERT_EQ(lineLength, camera.getLineLength());
   // pixel order in the buffer is HIGH_1, LOW_1, HIGH_2, LOW_2, HIGH_3, LOW_3 ...
-  // when camera sends data it starts with LOW_1 instead on HIGH_1
+  // when LiveOV7670 sends data it starts with LOW_1 instead on HIGH_1
   ASSERT_EQ(0, camera.getPixelByte(0));
   ASSERT_EQ(PIXEL_VALUE_START, camera.getPixelByte(1));
   ASSERT_EQ(PIXEL_VALUE_START+1, camera.getPixelByte(2));

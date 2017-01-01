@@ -4,8 +4,7 @@
 
 
 #include "gtest/gtest.h"
-#include "camera/base/CameraOV7670Registers.h"
-
+#include "LiveOV7670/CameraOV7670Registers.h"
 
 
 

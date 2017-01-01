@@ -4,7 +4,6 @@ project(LiveOV7670)
 
 # PlatformIO build targets
 # Must init platformio. See: PlatformIO_CLion_init.txt
-include_directories(arduino/lib/Adafruit_GFX_Library)
 add_subdirectory(arduino)
 
 
@@ -16,6 +15,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 # fake arduino headers
 include_directories(test/fake)
 # project headers
+include_directories(arduino/lib)
 include_directories(arduino/src)
 # gtest headers
 include_directories(${gtest_SOURCE_DIR}/include)
@@ -27,15 +27,15 @@ add_executable(runTests
         test/fake/Wire.cpp
         test/fake/OV7670Simulator.cpp
 
-        arduino/src/camera/base/CameraOV7670.cpp
-        arduino/src/camera/base/CameraOV7670Registers.cpp
-        arduino/src/camera/base/CameraOV7670RegistersDefault.cpp
-        arduino/src/camera/base/CameraOV7670RegistersQQVGA.cpp
-        arduino/src/camera/base/CameraOV7670RegistersQVGA.cpp
-        arduino/src/camera/base/CameraOV7670RegistersVGA.cpp
-        arduino/src/camera/base/CameraOV7670RegistersRGB565.cpp
-        arduino/src/camera/base/CameraOV7670RegistersBayerRGB.cpp
-        arduino/src/camera/base/CameraOV7670RegistersYUV422.cpp
+        arduino/lib/LiveOV7670/CameraOV7670.cpp
+        arduino/lib/LiveOV7670/CameraOV7670Registers.cpp
+        arduino/lib/LiveOV7670/CameraOV7670RegistersDefault.cpp
+        arduino/lib/LiveOV7670/CameraOV7670RegistersQQVGA.cpp
+        arduino/lib/LiveOV7670/CameraOV7670RegistersQVGA.cpp
+        arduino/lib/LiveOV7670/CameraOV7670RegistersVGA.cpp
+        arduino/lib/LiveOV7670/CameraOV7670RegistersRGB565.cpp
+        arduino/lib/LiveOV7670/CameraOV7670RegistersBayerRGB.cpp
+        arduino/lib/LiveOV7670/CameraOV7670RegistersYUV422.cpp
 
         test/src/camera/base/TestCameraOV7670.cpp
         test/src/camera/base/TestCameraOV7670Registers.cpp

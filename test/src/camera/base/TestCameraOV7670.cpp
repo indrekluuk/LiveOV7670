@@ -5,7 +5,7 @@
 
 #include "gtest/gtest.h"
 #include "OV7670Simulator.h"
-#include "camera/base/CameraOV7670.h"
+#include "LiveOV7670/CameraOV7670.h"
 
 
 
