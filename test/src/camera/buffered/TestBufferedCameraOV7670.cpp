@@ -6,11 +6,11 @@
 
 #include "gtest/gtest.h"
 #include "OV7670Simulator.h"
-#include "LiveOV7670/buffered/BufferedCameraOV7670_QVGA.h"
-#include "LiveOV7670/buffered/BufferedCameraOV7670_QQVGA.h"
-#include "LiveOV7670/buffered/BufferedCameraOV7670_QQVGA_10hz.h"
-#include "LiveOV7670/buffered/BufferedCameraOV7670_QQVGA_10hz_Grayscale.h"
-#include "LiveOV7670/buffered/BufferedCameraOV7670_80x120_10hz_Grayscale.h"
+#include "LiveOV7670/BufferedCameraOV7670_QVGA.h"
+#include "LiveOV7670/BufferedCameraOV7670_QQVGA.h"
+#include "LiveOV7670/BufferedCameraOV7670_QQVGA_10hz.h"
+#include "LiveOV7670/BufferedCameraOV7670_QQVGA_10hz_Grayscale.h"
+#include "LiveOV7670/BufferedCameraOV7670_80x120_10hz_Grayscale.h"
 
 
 

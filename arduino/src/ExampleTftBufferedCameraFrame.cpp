@@ -10,10 +10,10 @@
 
 #include "Arduino.h"
 #include "Adafruit_ST7735_mod.h"
-#include <buffered/BufferedCameraOV7670_QQVGA_10hz.h>
-#include <buffered/BufferedCameraOV7670_QQVGA.h>
-#include <buffered/BufferedCameraOV7670_QVGA.h>
-#include <buffered/BufferedCameraOV7670_QQVGA_10hz_Grayscale.h>
+#include <BufferedCameraOV7670_QQVGA_10hz.h>
+#include <BufferedCameraOV7670_QQVGA.h>
+#include <BufferedCameraOV7670_QVGA.h>
+#include <BufferedCameraOV7670_QQVGA_10hz_Grayscale.h>
 #include "GrayScaleTable.h"
 
 

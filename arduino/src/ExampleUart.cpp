@@ -8,7 +8,7 @@
 
 
 #include "Arduino.h"
-#include "LiveOV7670/base/CameraOV7670.h"
+#include "CameraOV7670.h"
 
 
 static const uint16_t lineLength = 160;

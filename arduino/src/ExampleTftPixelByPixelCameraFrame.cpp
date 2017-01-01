@@ -8,8 +8,8 @@
 
 
 #include "Arduino.h"
-#include "screen/Adafruit_ST7735_mod.h"
-#include "LiveOV7670/base/CameraOV7670.h"
+#include "Adafruit_ST7735_mod.h"
+#include "CameraOV7670.h"
 
 
 // scaler values for specific refresh rates
