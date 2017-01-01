@@ -12,6 +12,9 @@
 extern uint8_t dummy;
 
 
+#define __AVR_ATmega328P__ dummy
+
+
 #define PINB 0
 #define PINC 0
 #define PIND 0

@@ -4,6 +4,7 @@ project(LiveOV7670)
 
 # PlatformIO build targets
 # Must init platformio. See: PlatformIO_CLion_init.txt
+include_directories(arduino/lib/Adafruit_GFX_Library)
 add_subdirectory(arduino)
 
 
