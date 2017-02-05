@@ -23,7 +23,7 @@ public:
     void begin();
     void beginTransmission(int);
     void write(uint8_t byte);
-    void endTransmission();
+    int endTransmission();
     void requestFrom(int, int);
     uint8_t read();
 

@@ -19,9 +19,10 @@ void CameraOV7670Registers::init() {
 
 
 
-void CameraOV7670Registers::resetSettings() {
-  setRegister(REG_COM7, COM7_RESET);
+bool CameraOV7670Registers::resetSettings() {
+  bool isSuccessful = setRegister(REG_COM7, COM7_RESET);
   delay(500);
+  return isSuccessful;
 }
 
 
@@ -44,11 +45,11 @@ void CameraOV7670Registers::setRegisters(const RegisterData *programMemPointer) 
 
 
 
-void CameraOV7670Registers::setRegister(uint8_t addr, uint8_t val) {
+bool CameraOV7670Registers::setRegister(uint8_t addr, uint8_t val) {
   Wire.beginTransmission(i2cAddress);
   Wire.write(addr);
   Wire.write(val);
-  Wire.endTransmission();
+  return Wire.endTransmission() == 0;
 }
 
 

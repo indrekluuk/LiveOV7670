@@ -41,9 +41,9 @@ Adafruit_ST7735_mod tft = Adafruit_ST7735_mod(TFT_CS, TFT_DC, TFT_RST);
 
 // this is called in Arduino setup() function
 void initializeScreenAndCamera() {
-  camera.init();
+  bool cameraInitialized = camera.init();
   tft.initR(INITR_BLACKTAB);
-  tft.fillScreen(ST7735_BLACK);
+  tft.fillScreen(cameraInitialized ? ST7735_BLACK : ST7735_RED);
   noInterrupts();
 }
 

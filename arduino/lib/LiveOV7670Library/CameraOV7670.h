@@ -109,7 +109,7 @@ public:
       internalClockPreScaler(internalClockPreScaler),
       registers(i2cAddress) {};
 
-  void init();
+  bool init();
   void setManualContrastCenter(uint8_t center);
   void setContrast(uint8_t contrast);
   void setBrightness(uint8_t birghtness);
@@ -124,7 +124,7 @@ public:
 
 private:
   void initClock();
-  void setUpCamera();
+  bool setUpCamera();
 };
 
 

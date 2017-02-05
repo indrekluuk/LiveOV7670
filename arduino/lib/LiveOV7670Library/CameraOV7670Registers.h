@@ -32,9 +32,9 @@ public:
 
     void init();
 
-    void resetSettings();
+    bool resetSettings();
     void setRegisters(const RegisterData *registerData);
-    void setRegister(uint8_t addr, uint8_t val);
+    bool setRegister(uint8_t addr, uint8_t val);
     uint8_t readRegister(uint8_t addr);
     void setRegisterBitsOR(uint8_t addr, uint8_t bits);
     void setRegisterBitsAND(uint8_t addr, uint8_t bits);

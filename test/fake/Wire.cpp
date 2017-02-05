@@ -26,8 +26,8 @@ void FakeWire::write(uint8_t byte) {
   transmittedBytes.push_back(byte);
 }
 
-void FakeWire::endTransmission() {
-
+int FakeWire::endTransmission() {
+  return 0;
 }
 
 void FakeWire::requestFrom(int, int) {
