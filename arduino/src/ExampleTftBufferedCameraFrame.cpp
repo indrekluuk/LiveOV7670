@@ -43,7 +43,12 @@ Adafruit_ST7735_mod tft = Adafruit_ST7735_mod(TFT_CS, TFT_DC, TFT_RST);
 void initializeScreenAndCamera() {
   bool cameraInitialized = camera.init();
   tft.initR(INITR_BLACKTAB);
-  tft.fillScreen(cameraInitialized ? ST7735_BLACK : ST7735_RED);
+  if (cameraInitialized) {
+    tft.fillScreen(ST7735_BLACK);
+  } else {
+    tft.fillScreen(ST7735_RED);
+    delay(3000);
+  }
   noInterrupts();
 }
 
