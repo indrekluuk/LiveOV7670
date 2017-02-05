@@ -5,6 +5,7 @@
 bool CameraOV7670::init() {
   registers.init();
   initClock();
+  delay(10); // give camera some time to run before starting setup
   return setUpCamera();
 }
 
