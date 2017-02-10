@@ -56,6 +56,11 @@
 #define OV7670_PIXEL_CLOCK ((*GPIOB_BASE).IDR & 0x0010)
 #endif
 
+// href - PB3
+#ifndef OV7670_HREF
+#define OV7670_HREF ((*GPIOB_BASE).IDR & 0x0008)
+#endif
+
 // pixel byte - PB8..PB15
 #ifndef OV7670_PIXEL_BYTE
 #define OV7670_PIXEL_BYTE ((uint8_t*)(&(*GPIOB_BASE).IDR))[1]
@@ -70,6 +75,12 @@
 
 #endif
 
+
+//todo remove this
+#define C_PORT_OUT ((*GPIOC_BASE).ODR)
+#define C14_PIN_MASK 0x4000
+#define C14_ON C_PORT_OUT |= C14_PIN_MASK
+#define C14_OFF C_PORT_OUT &= ~C14_PIN_MASK
 
 
 
