@@ -64,10 +64,7 @@ void BufferedCameraOV7670_QQVGA::readLine() {
     waitForPixelClockLow();
     while (bufferIndex < getPixelBufferLength()) {
       asm volatile("nop");
-      asm volatile("nop");
-      asm volatile("nop");
       pixelBuffer.writeBuffer[bufferIndex++] = readPixelByte();
-      asm volatile("nop");
       asm volatile("nop");
       asm volatile("nop");
       asm volatile("nop");
