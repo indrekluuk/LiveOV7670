@@ -44,8 +44,12 @@ void initializeScreenAndCamera() {
   bool cameraInitialized = camera.init();
   tft.initR(INITR_BLACKTAB);
   if (cameraInitialized) {
+    // flash green screen if camera setup was successful
+    tft.fillScreen(ST7735_GREEN);
+    delay(1000);
     tft.fillScreen(ST7735_BLACK);
   } else {
+    // red screen if failed to connect to camera
     tft.fillScreen(ST7735_RED);
     delay(3000);
   }
