@@ -4,13 +4,16 @@
 
 bool CameraOV7670::init() {
   registers.init();
-  initClock();
+  initIO();
   delay(10); // give camera some time to run before starting setup
   return setUpCamera();
 }
 
 
-void CameraOV7670::initClock() {
+void CameraOV7670::initIO() {
+#ifdef OV7670_INIT_INPUTS
+  OV7670_INIT_INPUTS;
+#endif
   OV7670_INIT_CLOCK_OUT;
 }
 
