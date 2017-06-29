@@ -10,7 +10,7 @@
 
 
 // Pixel receiving order from LiveOV7670Library for downsampled pictures: Pixel_1_H, Pixel_1_L, Pixel_2_H, Pixel_2_L ...
-// First byte from LiveOV7670Library is half a pixel (lower byte of a pixel).
+// First byte from LiveOV7670Library is half a pixel (higher byte of first pixel).
 // Shift line data by 1 byte to correct for it.
 // This means that first pixel in each line is actually broken.
 template <typename TBuffer, TBuffer size>
