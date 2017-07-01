@@ -7,8 +7,10 @@
 #include "CameraOV7670Registers.h"
 
 
-// Arduino
-#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
+// Arduino.
+// Note: added __AVR_ATmega1280__ and __AVR_ATmega2560__ so it will compile for Arduino Mega.
+// HAVE NOT TESTED IF IT ACTUALLY WORKS WITH MEGA
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 /*
   B (digital pin 8 to 13)
   C (analog input pins)
