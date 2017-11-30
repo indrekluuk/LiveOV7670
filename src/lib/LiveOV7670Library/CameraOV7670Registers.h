@@ -41,6 +41,7 @@ public:
 
     void setDisablePixelClockDuringBlankLines();
     void setInternalClockPreScaler(int preScaler);
+    void setPLLMultiplier(uint8_t multiplier);
     void setManualContrastCenter(uint8_t center);
     void setContrast(uint8_t contrast);
     void setBrightness(uint8_t birghtness);

@@ -50,6 +50,7 @@ bool CameraOV7670::setUpCamera() {
 
     registers.setDisablePixelClockDuringBlankLines();
     registers.setInternalClockPreScaler(internalClockPreScaler);
+    registers.setPLLMultiplier(pllMultiplier);
 
     return true;
   } else {

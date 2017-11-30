@@ -113,6 +113,13 @@ public:
     RESOLUTION_QQVGA_160x120
   };
 
+  enum PLLMultiplier {
+      PLL_MULTIPLIER_BYPASS = 0,
+      PLL_MULTIPLIER_X4 = 1,
+      PLL_MULTIPLIER_X6 = 2,
+      PLL_MULTIPLIER_X8 = 3
+  };
+
 
 private:
   static const uint8_t i2cAddress = 0x21;
@@ -120,15 +127,22 @@ private:
   Resolution resolution;
   PixelFormat pixelFormat;
   uint8_t internalClockPreScaler;
+  PLLMultiplier pllMultiplier;
   CameraOV7670Registers registers;
 
 
 public:
 
-  CameraOV7670(Resolution resolution, PixelFormat format, uint8_t internalClockPreScaler) :
+  CameraOV7670(
+      Resolution resolution,
+      PixelFormat format,
+      uint8_t internalClockPreScaler,
+      PLLMultiplier pllMultiplier = PLL_MULTIPLIER_BYPASS
+  ) :
       resolution(resolution),
       pixelFormat(format),
       internalClockPreScaler(internalClockPreScaler),
+      pllMultiplier(pllMultiplier),
       registers(i2cAddress) {};
 
   bool init();

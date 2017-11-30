@@ -85,6 +85,13 @@ void CameraOV7670Registers::setInternalClockPreScaler(int preScaler) {
 }
 
 
+void CameraOV7670Registers::setPLLMultiplier(uint8_t multiplier) {
+  uint8_t mask = 0b11000000;
+  uint8_t currentValue = readRegister(DBLV);
+  setRegister(DBLV, (currentValue & ~mask) | (multiplier << 6));
+}
+
+
 void CameraOV7670Registers::setManualContrastCenter(uint8_t contrastCenter) {
   setRegisterBitsAND(MTXS, 0x7F); // disable auto contrast
   setRegister(REG_CONTRAST_CENTER, contrastCenter);
