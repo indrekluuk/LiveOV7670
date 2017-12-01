@@ -40,6 +40,7 @@ public:
     void setRegisterBitsAND(uint8_t addr, uint8_t bits);
 
     void setDisablePixelClockDuringBlankLines();
+    void setHREFReverse();
     void setInternalClockPreScaler(int preScaler);
     void setPLLMultiplier(uint8_t multiplier);
     void setManualContrastCenter(uint8_t center);

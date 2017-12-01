@@ -63,6 +63,7 @@ struct RegisterData {
 #define REG_COM10	0x15	/* Control 10 */
 #define COM10_HSYNC	0x40	/* HSYNC instead of HREF */
 #define COM10_PCLK_HB	0x20	/* Suppress PCLK on horiz blank */
+#define COM10_PCLK_REV	0x10	/* Reverse PCLK */
 #define COM10_HREF_REV	0x08	/* Reverse HREF */
 #define COM10_VS_LEAD	0x04	/* VSYNC on clock leading edge */
 #define COM10_VS_NEG	0x02	/* VSYNC negative */

@@ -38,8 +38,8 @@ protected:
   static OV7670PixelBuffer<TBuffer, bufferLength> pixelBuffer;
 
 public:
-  BufferedCameraOV7670(Resolution resolution, PixelFormat format, uint8_t internalClockPreScaler) :
-      CameraOV7670(resolution, format, internalClockPreScaler) {};
+  BufferedCameraOV7670(Resolution resolution, PixelFormat format, uint8_t internalClockPreScaler, PLLMultiplier pllMultiplier = PLL_MULTIPLIER_BYPASS) :
+      CameraOV7670(resolution, format, internalClockPreScaler, pllMultiplier) {};
 
   virtual inline void readLine() __attribute__((always_inline));
 
