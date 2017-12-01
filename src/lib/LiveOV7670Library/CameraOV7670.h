@@ -101,66 +101,68 @@ class CameraOV7670 {
 
 public:
 
-  enum PixelFormat {
-    PIXEL_RGB565,
-    PIXEL_BAYERRGB,
-    PIXEL_YUV422
-  };
+    enum PixelFormat {
+        PIXEL_RGB565,
+        PIXEL_BAYERRGB,
+        PIXEL_YUV422
+    };
 
-  enum Resolution {
-    RESOLUTION_VGA_640x480,
-    RESOLUTION_QVGA_320x240,
-    RESOLUTION_QQVGA_160x120
-  };
+    enum Resolution {
+        RESOLUTION_VGA_640x480,
+        RESOLUTION_QVGA_320x240,
+        RESOLUTION_QQVGA_160x120
+    };
 
-  enum PLLMultiplier {
-      PLL_MULTIPLIER_BYPASS = 0,
-      PLL_MULTIPLIER_X4 = 1,
-      PLL_MULTIPLIER_X6 = 2,
-      PLL_MULTIPLIER_X8 = 3
-  };
+    enum PLLMultiplier {
+        PLL_MULTIPLIER_BYPASS = 0,
+        PLL_MULTIPLIER_X4 = 1,
+        PLL_MULTIPLIER_X6 = 2,
+        PLL_MULTIPLIER_X8 = 3
+    };
 
 
-private:
-  static const uint8_t i2cAddress = 0x21;
+protected:
+    static const uint8_t i2cAddress = 0x21;
 
-  Resolution resolution;
-  PixelFormat pixelFormat;
-  uint8_t internalClockPreScaler;
-  PLLMultiplier pllMultiplier;
-  CameraOV7670Registers registers;
+    Resolution resolution;
+    PixelFormat pixelFormat;
+    uint8_t internalClockPreScaler;
+    PLLMultiplier pllMultiplier;
+    CameraOV7670Registers registers;
 
 
 public:
 
-  CameraOV7670(
-      Resolution resolution,
-      PixelFormat format,
-      uint8_t internalClockPreScaler,
-      PLLMultiplier pllMultiplier = PLL_MULTIPLIER_BYPASS
-  ) :
-      resolution(resolution),
-      pixelFormat(format),
-      internalClockPreScaler(internalClockPreScaler),
-      pllMultiplier(pllMultiplier),
-      registers(i2cAddress) {};
+    CameraOV7670(
+        Resolution resolution,
+        PixelFormat format,
+        uint8_t internalClockPreScaler,
+        PLLMultiplier pllMultiplier = PLL_MULTIPLIER_BYPASS
+    ) :
+        resolution(resolution),
+        pixelFormat(format),
+        internalClockPreScaler(internalClockPreScaler),
+        pllMultiplier(pllMultiplier),
+        registers(i2cAddress) {};
 
-  bool init();
-  void setManualContrastCenter(uint8_t center);
-  void setContrast(uint8_t contrast);
-  void setBrightness(uint8_t birghtness);
-  void reversePixelBits();
+    bool init();
+    void setManualContrastCenter(uint8_t center);
+    void setContrast(uint8_t contrast);
+    void setBrightness(uint8_t birghtness);
+    void reversePixelBits();
 
-  inline void waitForVsync(void) __attribute__((always_inline));
-  inline void waitForPixelClockRisingEdge(void) __attribute__((always_inline));
-  inline void waitForPixelClockLow(void) __attribute__((always_inline));
-  inline void waitForPixelClockHigh(void) __attribute__((always_inline));
-  inline uint8_t readPixelByte(void) __attribute__((always_inline));
+    inline void waitForVsync(void) __attribute__((always_inline));
+    inline void waitForPixelClockRisingEdge(void) __attribute__((always_inline));
+    inline void waitForPixelClockLow(void) __attribute__((always_inline));
+    inline void waitForPixelClockHigh(void) __attribute__((always_inline));
+    inline uint8_t readPixelByte(void) __attribute__((always_inline));
 
+protected:
+    virtual bool setUpCamera();
 
 private:
-  void initIO();
-  bool setUpCamera();
+    void initIO();
+
 };
 
 
