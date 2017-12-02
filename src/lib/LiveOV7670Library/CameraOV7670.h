@@ -29,9 +29,8 @@
 #ifndef OV7670_PIXEL_BYTE
 // (PIN 4..7) | (PIN A0..A3)
 #define OV7670_READ_PIXEL_BYTE(b) \
-                    uint8_t pind=PIND;\
                     uint8_t pinc=PINC;\
-                    b=((pind & 0b11110000) | (pinc & 0b00001111))
+                    b=((PIND & 0b11110000) | (pinc & 0b00001111))
 #endif
 
 // pin 3 to 8Mhz (LiveOV7670Library clock)

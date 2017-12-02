@@ -69,7 +69,6 @@ void BufferedCameraOV7670_QQVGA_20hz_Grayscale::readLine() {
 void BufferedCameraOV7670_QQVGA_20hz_Grayscale::isrReadLine() {
   asm volatile("nop");
   asm volatile("nop");
-  asm volatile("nop");
 
   // only way to get line data at 20Hz is to unroll pixel reading
   readPixels_unrolled_x160(0);
