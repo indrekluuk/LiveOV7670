@@ -26,7 +26,7 @@
 #define OV7670_PIXEL_CLOCK (PINB & 0b00010000) // PIN 12
 #endif
 
-#ifndef OV7670_PIXEL_BYTE
+#ifndef OV7670_READ_PIXEL_BYTE
 // (PIN 4..7) | (PIN A0..A3)
 #define OV7670_READ_PIXEL_BYTE(b) \
                     uint8_t pinc=PINC;\
@@ -75,8 +75,8 @@
 #endif
 
 // pixel byte - PB8..PB15
-#ifndef OV7670_PIXEL_BYTE
-#define OV7670_PIXEL_BYTE ((uint8_t*)(&(*GPIOB_BASE).IDR))[1]
+#ifndef OV7670_READ_PIXEL_BYTE
+#define OV7670_READ_PIXEL_BYTE(b) b = ((uint8_t*)(&(*GPIOB_BASE).IDR))[1]
 #endif
 
 // configure PA8 to output PLL/2 clock
