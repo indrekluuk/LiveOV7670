@@ -26,7 +26,6 @@
  *
  *  EXAMPLE = 4
  *  Gray scale image @20Hz. Interlaced image.
- *  Must connect HREF to PIN 12 instead of PCLK
  *
  */
 #define EXAMPLE 1
