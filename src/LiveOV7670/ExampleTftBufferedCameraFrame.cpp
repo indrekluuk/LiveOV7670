@@ -53,7 +53,8 @@ void initializeScreenAndCamera() {
     tft.fillScreen(ST7735_RED);
     delay(3000);
   }
-  noInterrupts();
+
+  TIMSK0 = 0; // disable "millis" timer interrupt
 }
 
 
