@@ -22,12 +22,16 @@
 #endif
 
 #ifndef OV7670_PIXEL_CLOCK
+#define OV7670_PIXEL_CLOCK_PIN 12
 #define OV7670_PIXEL_CLOCK (PINB & 0b00010000) // PIN 12
 #endif
 
 #ifndef OV7670_PIXEL_BYTE
 // (PIN 4..7) | (PIN A0..A3)
-#define OV7670_PIXEL_BYTE ((PIND & 0b11110000) | (PINC & 0b00001111))
+#define OV7670_READ_PIXEL_BYTE(b) \
+                    uint8_t pind=PIND;\
+                    uint8_t pinc=PINC;\
+                    b=((pind & 0b11110000) | (pinc & 0b00001111))
 #endif
 
 // pin 3 to 8Mhz (LiveOV7670Library clock)
@@ -155,7 +159,7 @@ public:
     inline void waitForPixelClockRisingEdge(void) __attribute__((always_inline));
     inline void waitForPixelClockLow(void) __attribute__((always_inline));
     inline void waitForPixelClockHigh(void) __attribute__((always_inline));
-    inline uint8_t readPixelByte(void) __attribute__((always_inline));
+    inline void readPixelByte(uint8_t & byte) __attribute__((always_inline));
 
 protected:
     virtual bool setUpCamera();
@@ -184,8 +188,8 @@ void CameraOV7670::waitForPixelClockHigh() {
   while(!OV7670_PIXEL_CLOCK);
 }
 
-uint8_t CameraOV7670::readPixelByte() {
-  return OV7670_PIXEL_BYTE;
+void CameraOV7670::readPixelByte(uint8_t & byte) {
+  OV7670_READ_PIXEL_BYTE(byte);
 }
 
 

@@ -40,7 +40,8 @@ void initializeScreenAndCamera() {
     tft.fillScreen(ST7735_RED);
     delay(3000);
   }
-  noInterrupts();
+
+  TIMSK0 = 0; // disable "millis" timer interrupt
 }
 
 
@@ -82,11 +83,6 @@ void processFrame() {
 
 
 
-
-
-
-static const uint16_t byteCountForDisplay = camera.getPixelBufferLength() < screen_w*2 ?
-                                            camera.getPixelBufferLength() : screen_w*2;
 
 
 void sendLineToDisplay() {

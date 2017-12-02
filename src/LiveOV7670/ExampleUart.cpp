@@ -90,19 +90,19 @@ void processFrame() {
 
       // we can read 5 bytes from camera while one byte is sent over UART
       camera.waitForPixelClockRisingEdge();
-      lineBuffer[x] = camera.readPixelByte();
+      camera.readPixelByte(lineBuffer[x]);
 
       camera.waitForPixelClockRisingEdge();
-      lineBuffer[x+1] = camera.readPixelByte();
+      camera.readPixelByte(lineBuffer[x+1]);
 
       camera.waitForPixelClockRisingEdge();
-      lineBuffer[x+2] = camera.readPixelByte();
+      camera.readPixelByte(lineBuffer[x+2]);
 
       camera.waitForPixelClockRisingEdge();
-      lineBuffer[x+3] = camera.readPixelByte();
+      camera.readPixelByte(lineBuffer[x+3]);
 
       camera.waitForPixelClockRisingEdge();
-      lineBuffer[x+4] = camera.readPixelByte();
+      camera.readPixelByte(lineBuffer[x+4]);
     }
 
     // send rest of the line

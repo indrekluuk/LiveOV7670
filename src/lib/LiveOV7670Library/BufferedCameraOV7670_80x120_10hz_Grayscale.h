@@ -60,7 +60,7 @@ void BufferedCameraOV7670_80x120_10hz_Grayscale::readLine() {
     asm volatile("nop");
     asm volatile("nop");
 
-    pixelBuffer.readBuffer[i] = readPixelByte();
+    readPixelByte(pixelBuffer.readBuffer[i]);
   }
 }
 

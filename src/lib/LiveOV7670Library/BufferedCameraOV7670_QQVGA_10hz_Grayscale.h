@@ -37,7 +37,7 @@ void BufferedCameraOV7670_QQVGA_10hz_Grayscale::readLine() {
   asm volatile("nop");
 
   for (uint8_t i = 0; i<160; i++) {
-    pixelBuffer.readBuffer[i] = readPixelByte();
+    readPixelByte(pixelBuffer.readBuffer[i]);
     asm volatile("nop");
     asm volatile("nop");
     asm volatile("nop");

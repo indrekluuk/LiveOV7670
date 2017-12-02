@@ -98,9 +98,9 @@ void BufferedCameraOV7670<TBuffer, bufferLength, Tx, lineLength, Ty, lineCount>:
 
   while (bufferIndex < getPixelBufferLength()) {
     waitForPixelClockRisingEdge();
-    pixelBuffer.writeBuffer[bufferIndex++] = readPixelByte();
+    readPixelByte(pixelBuffer.writeBuffer[bufferIndex++]);
     waitForPixelClockRisingEdge();
-    pixelBuffer.writeBuffer[bufferIndex++] = readPixelByte();
+    readPixelByte(pixelBuffer.writeBuffer[bufferIndex++]);
   }
 }
 

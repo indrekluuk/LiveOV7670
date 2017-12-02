@@ -73,9 +73,9 @@ void BufferedCameraOV7670_QQVGA_10hz::readPixels_unrolled_x10(uint16_t byteIndex
 
 void BufferedCameraOV7670_QQVGA_10hz::readPixel_unrolled(uint16_t byteIndex) {
   asm volatile("nop");
-  pixelBuffer.writeBuffer[byteIndex + 0] = readPixelByte();
+  readPixelByte(pixelBuffer.writeBuffer[byteIndex + 0]);
   asm volatile("nop");
-  pixelBuffer.writeBuffer[byteIndex + 1] = readPixelByte();
+  readPixelByte(pixelBuffer.writeBuffer[byteIndex + 1]);
 }
 
 

@@ -86,22 +86,26 @@ void processFrame() {
     // We have to swap byte order for the screen.
 
     camera.waitForPixelClockRisingEdge();
-    bufferedLowByte = camera.readPixelByte();
+    camera.readPixelByte(bufferedLowByte);
 
     for (uint16_t x = 0; x < lineLength-1; x++) {
 
       camera.waitForPixelClockRisingEdge();
-      sendPixelByte(camera.readPixelByte()); // send pixel high byte
+      uint8_t highByte;
+      camera.readPixelByte(highByte);
+      sendPixelByte(highByte); // send pixel high byte
 
       lowByte = bufferedLowByte;
       camera.waitForPixelClockRisingEdge();
-      bufferedLowByte = camera.readPixelByte();
+       camera.readPixelByte(bufferedLowByte);
       sendPixelByte(lowByte); // send pixel low byte
     }
 
     // send last pixel
     camera.waitForPixelClockRisingEdge();
-    sendPixelByte(camera.readPixelByte()); // send pixel high byte
+    uint8_t highByte;
+    camera.readPixelByte(highByte);
+    sendPixelByte(highByte); // send pixel high byte
     pixelSendingDelay(); // prevent sending collision
     sendPixelByte(bufferedLowByte); // send pixel low byte
     pixelSendingDelay();

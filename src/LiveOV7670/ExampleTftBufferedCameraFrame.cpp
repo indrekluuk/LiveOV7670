@@ -24,6 +24,7 @@
 BufferedCameraOV7670_QQVGA_10hz_Grayscale camera;
 #else
 BufferedCameraOV7670_QQVGA_10hz camera(CameraOV7670::PIXEL_RGB565);
+//BufferedCameraOV7670_QQVGA camera(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QQVGA::FPS_5_Hz);
 //BufferedCameraOV7670_QQVGA camera(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QQVGA::FPS_2_Hz);
 //BufferedCameraOV7670_QVGA camera(CameraOV7670::PIXEL_RGB565, BufferedCameraOV7670_QVGA::FPS_2p5_Hz);
 #endif
