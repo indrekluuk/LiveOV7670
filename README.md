@@ -1,7 +1,7 @@
 # LiveOV7670
   
 Demo:  
-https://www.youtube.com/watch?v=TqSY6FETuos  
+https://www.youtube.com/watch?v=TqSY6FETuos&list=PLVilroPGLJaesaS5mP93i0goPck2JK-O4&index=2
   
 -------------------------------------------------------------------------------  
   
