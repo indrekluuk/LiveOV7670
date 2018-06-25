@@ -153,6 +153,7 @@ public:
     void setContrast(uint8_t contrast);
     void setBrightness(uint8_t birghtness);
     void reversePixelBits();
+    void showColorBars(bool transparent);
 
     inline void waitForVsync(void) __attribute__((always_inline));
     inline void waitForPixelClockRisingEdge(void) __attribute__((always_inline));

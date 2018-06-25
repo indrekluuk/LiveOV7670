@@ -47,6 +47,7 @@ public:
     void setContrast(uint8_t contrast);
     void setBrightness(uint8_t birghtness);
     void reversePixelBits();
+    void setShowColorBar(bool transparent);
 
 };
 

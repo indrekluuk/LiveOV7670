@@ -118,5 +118,13 @@ void CameraOV7670Registers::reversePixelBits() {
 }
 
 
+void CameraOV7670Registers::setShowColorBar(bool transparent) {
+  if (transparent) {
+    setRegisterBitsOR(REG_COM7, COM7_COLOR_BAR);
+  } else {
+    setRegisterBitsOR(REG_COM17, COM17_CBAR);
+  }
+}
+
 
 

@@ -79,6 +79,9 @@ void CameraOV7670::reversePixelBits() {
   registers.reversePixelBits();
 }
 
+void CameraOV7670::showColorBars(bool transparent) {
+  registers.setShowColorBar(transparent);
+}
 
 
 
