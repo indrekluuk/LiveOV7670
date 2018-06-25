@@ -78,6 +78,9 @@ void CameraOV7670Registers::setDisablePixelClockDuringBlankLines() {
   setRegisterBitsOR(REG_COM10, COM10_PCLK_HB);
 }
 
+void CameraOV7670Registers::setDisableHREFDuringBlankLines() {
+  setRegisterBitsOR(REG_COM6, COM6_HREF_HB);
+}
 
 void CameraOV7670Registers::setHREFReverse() {
   setRegisterBitsOR(REG_COM10, COM10_HREF_REV);

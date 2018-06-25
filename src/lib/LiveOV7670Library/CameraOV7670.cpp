@@ -49,6 +49,7 @@ bool CameraOV7670::setUpCamera() {
     }
 
     registers.setDisablePixelClockDuringBlankLines();
+    registers.setDisableHREFDuringBlankLines();
     registers.setInternalClockPreScaler(internalClockPreScaler);
     registers.setPLLMultiplier(pllMultiplier);
 

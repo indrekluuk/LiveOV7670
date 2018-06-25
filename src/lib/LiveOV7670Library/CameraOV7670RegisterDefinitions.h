@@ -37,6 +37,7 @@ struct RegisterData {
 #define REG_COM4	0x0d	/* Control 4 */
 #define REG_COM5	0x0e	/* All "reserved" */
 #define REG_COM6	0x0f	/* Control 6 */
+#define COM6_HREF_HB 0x80	/* Suppress PCLK on horiz blank */
 #define REG_AECH	0x10	/* More bits of AEC value */
 #define REG_CLKRC	0x11	/* Clocl control */
 #define CLK_EXT		0x40	/* Use external clock directly */
