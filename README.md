@@ -2,7 +2,9 @@
   
 Demo:  
 https://www.youtube.com/watch?v=TqSY6FETuos&list=PLVilroPGLJaesaS5mP93i0goPck2JK-O4&index=2
-  
+Datasheet for OV7670:  
+https://www.voti.nl/docs/OV7670.pdf
+
 -------------------------------------------------------------------------------  
   
 Compiling in Arduino IDE:  
