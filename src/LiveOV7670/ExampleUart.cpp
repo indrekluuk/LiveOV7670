@@ -10,18 +10,27 @@
 #include "Arduino.h"
 #include "CameraOV7670.h"
 
+#define UART_320_240 1;
 
+#ifdef UART_320_240
+static const uint16_t lineLength = 320;//160;
+static const uint16_t lineCount = 240; //120;
+#else
 static const uint16_t lineLength = 160;
 static const uint16_t lineCount = 120;
+#endif
+
 static const uint16_t COLOR_GREEN = 0x07E0;
 static const uint16_t COLOR_RED = 0xF800;
 
 
 
 CameraOV7670::PixelFormat pixelFormat = CameraOV7670::PIXEL_RGB565;
+#ifdef UART_320_240
+CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, pixelFormat, 22);
+#else
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 5);
-
-
+#endif
 
 void sendBlankFrame(uint16_t color);
 inline void endOfFrame(void) __attribute__((always_inline));
@@ -190,7 +199,3 @@ void pixelSendingDelay() {
 
 
 #endif
-
-
-
-
