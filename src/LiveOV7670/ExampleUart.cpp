@@ -10,6 +10,9 @@
 #include "Arduino.h"
 #include "CameraOV7670.h"
 
+static const uint8_t COMMAND_NEW_FRAME = 0x01;
+static const uint8_t COMMAND_END_OF_LINE = 0x02;
+
 static const uint16_t COLOR_GREEN = 0x07E0;
 static const uint16_t COLOR_RED = 0xF800;
 CameraOV7670::PixelFormat pixelFormat = CameraOV7670::PIXEL_RGB565;
@@ -45,7 +48,7 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 34);
 
 
 void sendBlankFrame(uint16_t color);
-inline void endOfFrame(void) __attribute__((always_inline));
+inline void startNewFrame(void) __attribute__((always_inline));
 inline void endOfLine(void) __attribute__((always_inline));
 inline void sendNextPixelByte() __attribute__((always_inline));
 inline void sendPixelByteH(uint8_t byte) __attribute__((always_inline));
@@ -75,6 +78,7 @@ void sendBlankFrame(uint16_t color) {
   uint8_t colorH = (color >> 8) & 0xFF;
   uint8_t colorL = color & 0xFF;
 
+  startNewFrame();
   for (uint16_t j=0; j<lineCount; j++) {
     for (uint16_t i=0; i<lineLength; i++) {
       sendPixelByteH(colorH);
@@ -84,8 +88,6 @@ void sendBlankFrame(uint16_t color) {
     }
     endOfLine();
   }
-  endOfFrame();
-
 }
 
 
@@ -96,9 +98,10 @@ uint8_t lineBuffer [lineLength*2 + 1 + 5];
 uint16_t lineBufferIndex = 0;
 
 
-
 // this is called in Arduino loop() function
 void processFrame() {
+  startNewFrame();
+
   camera.waitForVsync();
 
   for (uint16_t y = 0; y < lineCount; y++) {
@@ -131,16 +134,18 @@ void processFrame() {
       sendNextPixelByte();
       pixelSendingDelay();
     }
-
     endOfLine();
   }
-
-  endOfFrame();
 }
 
 
 
-void endOfFrame() {
+void startNewFrame() {
+  UDR0 = 0x00;
+  pixelSendingDelay();
+  UDR0 = COMMAND_NEW_FRAME;
+  pixelSendingDelay();
+
   // frame width
   UDR0 = (lineLength >> 8) & 0xFF;
   pixelSendingDelay();
@@ -156,21 +161,14 @@ void endOfFrame() {
   // pixel format
   UDR0 = (pixelFormat);
   pixelSendingDelay();
-
-  UDR0 = 0xFF;
-  pixelSendingDelay();
-  UDR0 = 0x00;
-  pixelSendingDelay();
-  UDR0 = 0x00;
-  pixelSendingDelay();
-  UDR0 = 0x00;
-  pixelSendingDelay();
 }
 
 
 
 void endOfLine()   {
   UDR0 = 0x00;
+  pixelSendingDelay();
+  UDR0 = COMMAND_END_OF_LINE;
   pixelSendingDelay();
 }
 
@@ -179,7 +177,6 @@ void sendNextPixelByte() {
   uint8_t byte = lineBuffer[lineBufferIndex];
   uint8_t isLowPixelByte = lineBufferIndex & 0x01;
 
-  // make pixel color always slightly above 0 since zero is end of line
   if (isLowPixelByte) {
     sendPixelByteL(byte);
   } else {
@@ -191,12 +188,12 @@ void sendNextPixelByte() {
 
 void sendPixelByteH(uint8_t byte) {
   //              RRRRRGGG
-  UDR0 = byte | 0b00001000;
+  UDR0 = byte | 0b00001000; // make pixel color always slightly above 0 since zero is end of line marker
 }
 
 void sendPixelByteL(uint8_t byte) {
   //              GGGBBBBB
-  UDR0 = byte | 0b00100001;
+  UDR0 = byte | 0b00100001; // make pixel color always slightly above 0 since zero is end of line marker
 }
 
 
