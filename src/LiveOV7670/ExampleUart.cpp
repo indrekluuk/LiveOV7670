@@ -16,9 +16,10 @@ CameraOV7670::PixelFormat pixelFormat = CameraOV7670::PIXEL_RGB565;
 
 
 // select resolution and communication speed:
-#define UART_MODE 1 // 320x240 with 1M baud
-//#define UART_MODE 2 // 160x120 with 1M baud
-//#define UART_MODE 3 // 160x120 with 115200 baud
+// 1 - 320x240 with 1M baud
+// 2 - 160x120 with 1M baud
+// 3 - 160x120 with 115200 baud
+#define UART_MODE 1
 
 #if UART_MODE==1
 static const uint16_t lineLength = 320;
