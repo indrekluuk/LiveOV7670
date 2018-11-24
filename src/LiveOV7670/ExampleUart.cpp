@@ -42,7 +42,7 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 5);
 static const uint16_t lineLength = 160;
 static const uint16_t lineCount = 120;
 static const uint32_t baud  = 115200;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 34);
+CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 35);
 #endif
 
 
