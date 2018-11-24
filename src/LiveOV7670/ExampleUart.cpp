@@ -10,27 +10,38 @@
 #include "Arduino.h"
 #include "CameraOV7670.h"
 
-#define UART_320_240 1;
-
-#ifdef UART_320_240
-static const uint16_t lineLength = 320;//160;
-static const uint16_t lineCount = 240; //120;
-#else
-static const uint16_t lineLength = 160;
-static const uint16_t lineCount = 120;
-#endif
-
 static const uint16_t COLOR_GREEN = 0x07E0;
 static const uint16_t COLOR_RED = 0xF800;
-
-
-
 CameraOV7670::PixelFormat pixelFormat = CameraOV7670::PIXEL_RGB565;
-#ifdef UART_320_240
+
+
+// select resolution and communication speed:
+#define UART_MODE 1 // 320x240 with 1M baud
+//#define UART_MODE 2 // 160x120 with 1M baud
+//#define UART_MODE 3 // 160x120 with 115200 baud
+
+#if UART_MODE==1
+static const uint16_t lineLength = 320;
+static const uint16_t lineCount = 240;
+static const uint32_t baud  = 1000000;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, pixelFormat, 22);
-#else
+#endif
+
+#if UART_MODE==2
+static const uint16_t lineLength = 160;
+static const uint16_t lineCount = 120;
+static const uint32_t baud  = 1000000;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 5);
 #endif
+
+#if UART_MODE==3
+static const uint16_t lineLength = 160;
+static const uint16_t lineCount = 120;
+static const uint32_t baud  = 115200;
+CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 34);
+#endif
+
+
 
 void sendBlankFrame(uint16_t color);
 inline void endOfFrame(void) __attribute__((always_inline));
@@ -45,7 +56,7 @@ inline void pixelSendingDelay() __attribute__((always_inline));
 
 // this is called in Arduino setup() function
 void initializeScreenAndCamera() {
-  Serial.begin(1000000); // 2000000 is unreliable
+  Serial.begin(baud); // 2000000 is unreliable
   if (camera.init()) {
     sendBlankFrame(COLOR_GREEN);
     delay(1000);
