@@ -29,21 +29,24 @@ CameraOV7670::PixelFormat pixelFormat = CameraOV7670::PIXEL_RGB565;
 #if UART_MODE==1
 static const uint16_t lineLength = 320;
 static const uint16_t lineCount = 240;
-static const uint32_t baud  = 2000000; // 2000000 may be unreliable
-CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, pixelFormat, 17);
+static const uint32_t baud  = 2000000; // may be unreliable
+static const uint32_t sendPixelCountWhileReading  = 1;
+CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, pixelFormat, 16);
 #endif
 
 #if UART_MODE==2
 static const uint16_t lineLength = 320;
 static const uint16_t lineCount = 240;
 static const uint32_t baud  = 1000000;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, pixelFormat, 22);
+static const uint32_t sendPixelCountWhileReading = 2;
+CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, pixelFormat, 18);
 #endif
 
 #if UART_MODE==3
 static const uint16_t lineLength = 160;
 static const uint16_t lineCount = 120;
 static const uint32_t baud  = 1000000;
+static const uint32_t sendPixelCountWhileReading  = 4;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 5);
 #endif
 
@@ -51,6 +54,7 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 5);
 static const uint16_t lineLength = 160;
 static const uint16_t lineCount = 120;
 static const uint32_t baud  = 115200;
+static const uint32_t sendPixelCountWhileReading  = 4;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, pixelFormat, 35);
 #endif
 
@@ -115,27 +119,21 @@ void processFrame() {
 
   for (uint16_t y = 0; y < lineCount; y++) {
     lineBufferIndex = 0;
+    uint8_t sendWhileReadCounter = 0;
+
     lineBuffer[0] = 0; // first byte from Camera is half a pixel
 
-    for (uint16_t x = 1; x < lineLength*2+1; x+=5) {
+    for (uint16_t x = 1; x < lineLength*2+1; x++) {
       // start sending first bytes while reading pixels from camera
-      sendNextPixelByte();
+      if (sendWhileReadCounter) {
+        sendWhileReadCounter--;
+      } else {
+        sendNextPixelByte();
+        sendWhileReadCounter = sendPixelCountWhileReading;
+      }
 
-      // we can read 5 bytes from camera while one byte is sent over UART
       camera.waitForPixelClockRisingEdge();
       camera.readPixelByte(lineBuffer[x]);
-
-      camera.waitForPixelClockRisingEdge();
-      camera.readPixelByte(lineBuffer[x+1]);
-
-      camera.waitForPixelClockRisingEdge();
-      camera.readPixelByte(lineBuffer[x+2]);
-
-      camera.waitForPixelClockRisingEdge();
-      camera.readPixelByte(lineBuffer[x+3]);
-
-      camera.waitForPixelClockRisingEdge();
-      camera.readPixelByte(lineBuffer[x+4]);
     }
 
     // send rest of the line
