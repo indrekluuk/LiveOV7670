@@ -37,7 +37,7 @@
 #ifndef OV7670_INIT_CLOCK_OUT
 #define OV7670_INIT_CLOCK_OUT \
                     pinMode(3, OUTPUT); \
-                    TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM21) | _BV(WGM20); \
+                    TCCR2A = _BV(COM2B1) | _BV(WGM21) | _BV(WGM20); \
                     TCCR2B = _BV(WGM22) | _BV(CS20); \
                     OCR2A = 1; \
                     OCR2B = 0
