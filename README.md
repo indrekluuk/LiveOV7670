@@ -1,9 +1,14 @@
 # LiveOV7670
   
 Demo:  
-https://www.youtube.com/watch?v=TqSY6FETuos&list=PLVilroPGLJaesaS5mP93i0goPck2JK-O4&index=2
+https://www.youtube.com/watch?v=TqSY6FETuos&list=PLVilroPGLJaesaS5mP93i0goPck2JK-O4&index=2  
+Tutorial 1 (image to screen):  
+https://www.youtube.com/watch?v=Dp3RMb0e1eA&index=3&list=PLVilroPGLJaesaS5mP93i0goPck2JK-O4  
+Tutorial 2 (image to PC):  
+https://www.youtube.com/watch?v=L9DTW1ulsT0&index=5&list=PLVilroPGLJaesaS5mP93i0goPck2JK-O4  
+  
 Datasheet for OV7670:  
-https://www.voti.nl/docs/OV7670.pdf
+https://www.voti.nl/docs/OV7670.pdf  
 
 -------------------------------------------------------------------------------  
   
