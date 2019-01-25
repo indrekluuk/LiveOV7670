@@ -72,10 +72,27 @@ void BufferedCameraOV7670_QQVGA_10hz::readPixels_unrolled_x10(uint16_t byteIndex
 }
 
 void BufferedCameraOV7670_QQVGA_10hz::readPixel_unrolled(uint16_t byteIndex) {
+  #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+  // Arduino Mega has all the pixel bits on one PORT and reading a pixel byte is faster.
+  asm volatile("nop");
+  readPixelByte(pixelBuffer.writeBuffer[byteIndex + 0]);
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+
+  asm volatile("nop");
+  readPixelByte(pixelBuffer.writeBuffer[byteIndex + 1]);
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  asm volatile("nop");
+  #else
   asm volatile("nop");
   readPixelByte(pixelBuffer.writeBuffer[byteIndex + 0]);
   asm volatile("nop");
   readPixelByte(pixelBuffer.writeBuffer[byteIndex + 1]);
+  #endif
 }
 
 
