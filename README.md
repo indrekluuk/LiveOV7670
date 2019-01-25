@@ -20,9 +20,14 @@ Compiling in Arduino IDE:
 4. Select Tools->Board->Arduino Uno/Nano
   
 -------------------------------------------------------------------------------
-  
+
+Connection shcema for the PCB board:  
 https://raw.githubusercontent.com/indrekluuk/LiveOV7670/master/LiveOV7670.png
 
+-------------------------------------------------------------------------------
+  
+### Connections for Arduino Uno/Nano  
+  
 OV7670 connections:  
   
 VSYNC - PIN2  
@@ -39,11 +44,39 @@ PWDN  - GND
   
 1.8" TFT connections:  
   
-DC - PIN 8 (5V -> 3.3V)  
-CS - PIN 9 (5V -> 3.3V)  
-RESET - PIN 10 (5V -> 3.3V)  
-SPI data - PIN 11 (5V -> 3.3V)  
-SPI clock - PIN 13 (5V -> 3.3V)  
+DC - PIN8 (5V -> 3.3V)  
+CS - PIN9 (5V -> 3.3V)  
+RESET - PIN10 (5V -> 3.3V)  
+SPI data - PIN11 (5V -> 3.3V)  
+SPI clock - PIN13 (5V -> 3.3V)  
+VCC - 5V/3.3V (depending on jumper position on the TFT board)  
+BL - 3.3V  
+GND - GND  
+  
+-------------------------------------------------------------------------------
+   
+### Connections for Arduino Mega  
+  
+OV7670 connections:  
+  
+VSYNC - PIN2  
+XCLCK - PIN9 (must be level shifted from 5V -> 3.3V)  
+PCLCK - PIN12  
+SIOD  - PIN20-SDA (I2C data) - 10K resistor to 3.3V  
+SIOC  - PIN21-SCL (I2C clock) - 10K resistor to 3.3V  
+D0..D7 - PIN22..PIN29 (pixel data bits 0..7)  
+3.3V  - 3.3V  
+RESET - 3.3V  
+GND   - GND  
+PWDN  - GND  
+  
+1.8" TFT connections:  
+  
+DC - PIN48 (5V -> 3.3V)  
+CS - PIN53 (5V -> 3.3V)  
+RESET - PIN49 (5V -> 3.3V)  
+SPI data - PIN51 (5V -> 3.3V)  
+SPI clock - PIN52 (5V -> 3.3V)  
 VCC - 5V/3.3V (depending on jumper position on the TFT board)  
 BL - 3.3V  
 GND - GND  
