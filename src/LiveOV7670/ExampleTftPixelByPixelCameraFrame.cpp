@@ -33,14 +33,13 @@ int TFT_RST = 49;
 int TFT_CS  = 53;
 int TFT_DC  = 48;
 // TFT_SPI_clock = 52 and TFT_SPI_data = 51
-Adafruit_ST7735_mod tft = Adafruit_ST7735_mod(TFT_CS, TFT_DC, TFT_RST);
 #else
 int TFT_RST = 10;
 int TFT_CS  = 9;
 int TFT_DC  = 8;
 // TFT_SPI_clock = 13 and TFT_SPI_data = 11
-Adafruit_ST7735_mod tft = Adafruit_ST7735_mod(TFT_CS, TFT_DC, TFT_RST);
 #endif
+Adafruit_ST7735_mod tft = Adafruit_ST7735_mod(TFT_CS, TFT_DC, TFT_RST);
 
 
 
@@ -181,7 +180,3 @@ void pixelSendingDelay() {
 
 
 #endif
-
-
-
-
