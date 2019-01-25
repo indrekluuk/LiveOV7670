@@ -7,10 +7,8 @@
 #include "CameraOV7670Registers.h"
 
 
-// Arduino.
-// Note: added __AVR_ATmega1280__ and __AVR_ATmega2560__ so it will compile for Arduino Mega.
-// HAVE NOT TESTED IF IT ACTUALLY WORKS WITH MEGA
-#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+// Arduino Uno/Nano.
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
 /*
   B (digital pin 8 to 13)
   C (analog input pins)
@@ -37,6 +35,38 @@
 #ifndef OV7670_INIT_CLOCK_OUT
 #define OV7670_INIT_CLOCK_OUT \
                     pinMode(3, OUTPUT); \
+                    TCCR2A = _BV(COM2B1) | _BV(WGM21) | _BV(WGM20); \
+                    TCCR2B = _BV(WGM22) | _BV(CS20); \
+                    OCR2A = 1; \
+                    OCR2B = 0
+#endif
+
+#endif
+
+
+
+// Arduino Mega.
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+
+#ifndef OV7670_VSYNC
+#define OV7670_VSYNC (PINE & 0b00010000) // PIN 2
+#endif
+
+#ifndef OV7670_PIXEL_CLOCK
+#define OV7670_PIXEL_CLOCK_PIN 12
+#define OV7670_PIXEL_CLOCK (PINB & 0b01000000) // PIN 12
+#endif
+
+#ifndef OV7670_READ_PIXEL_BYTE
+// PIN 22..29
+#define OV7670_READ_PIXEL_BYTE(b) \
+                    b=PINA
+#endif
+
+// pin 9 to 8Mhz (LiveOV7670Library clock)
+#ifndef OV7670_INIT_CLOCK_OUT
+#define OV7670_INIT_CLOCK_OUT \
+                    pinMode(9, OUTPUT); \
                     TCCR2A = _BV(COM2B1) | _BV(WGM21) | _BV(WGM20); \
                     TCCR2B = _BV(WGM22) | _BV(CS20); \
                     OCR2A = 1; \
