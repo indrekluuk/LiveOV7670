@@ -59,8 +59,13 @@
 
 #ifndef OV7670_READ_PIXEL_BYTE
 // PIN 22..29
+// Add "nop" so the timing would be compatible with Uno/Nano
 #define OV7670_READ_PIXEL_BYTE(b) \
-                    b=PINA
+                    b=PINA;\
+                    asm volatile("nop");\
+                    asm volatile("nop");\
+                    asm volatile("nop");\
+                    asm volatile("nop")
 #endif
 
 // pin 9 to 8Mhz (LiveOV7670Library clock)
