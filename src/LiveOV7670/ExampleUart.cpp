@@ -99,11 +99,10 @@ inline void pixelSendingDelay() __attribute__((always_inline));
 // this is called in Arduino setup() function
 void initializeScreenAndCamera() {
 
-  // This is not necessary and has no effect for ATMEGA based Arduinos.
-  // WAVGAT Nano has slower clock rate by default.
-  // For UART communiation we want to set it to 16Mhz to match Atmel based Arduino
-  CLKPR = 0x80; // enter clock rate change mode
-  CLKPR = 1; // set prescaler to 1. WAVGAT MCU has it 3 by default.
+  // Enable this for WAVGAT CPUs
+  // For UART communiation we want to set WAVGAT Nano to 16Mhz to match Atmel based Arduino
+  //CLKPR = 0x80; // enter clock rate change mode
+  //CLKPR = 1; // set prescaler to 1. WAVGAT MCU has it 3 by default.
   
   Serial.begin(baud);
   if (camera.init()) {

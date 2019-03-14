@@ -28,7 +28,7 @@
  *  Gray scale image @20Hz. Interlaced image.
  *
  */
-#define EXAMPLE 1
+#define EXAMPLE 3
 
 
 
