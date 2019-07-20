@@ -26,6 +26,7 @@ static const uint16_t UART_PIXEL_FORMAT_GRAYSCALE = 2;
 // 4 - 160x120 with 115200 baud
 // 5 - 320x240 grayscale with 1M baud
 // 6 - 160x120 grayscale with 1M baud
+// 7 - 640x480 grayscale with 1M baud (very unreliable)
 #define UART_MODE 2
 
 
@@ -81,6 +82,14 @@ static const uint32_t baud  = 1000000;
 static const uint32_t uartSendWhileReadingCount = 0;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_YUV422, 2);
+#endif
+
+#if UART_MODE==7
+static const uint16_t lineLength = 640;
+static const uint16_t lineCount = 480;
+static const uint32_t baud  = 1000000;
+static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
+CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YUV422, 63);
 #endif
 
 
@@ -150,6 +159,24 @@ void processFrame() {
   camera.waitForVsync();
 
   for (uint16_t y = 0; y < lineCount; y++) {
+
+#if UART_MODE==7
+    // separate loop for full VGA
+    for (uint16_t x = 0; x < lineLength; x++) {
+      // ignore first pixel byte
+      camera.waitForPixelClockRisingEdge();
+
+      // second byte is grayscale byte
+      camera.waitForPixelClockRisingEdge();
+      uint8_t pixelByte;
+      camera.readPixelByte(pixelByte);
+      sendPixelByteGrayscale(pixelByte);
+    }
+    // delay for last byte
+    pixelSendingDelay();
+
+#else
+
     lineBufferIndex = 0;
     uint8_t sendWhileReadCounter = 0;
 
@@ -175,6 +202,8 @@ void processFrame() {
       sendNextPixelByte();
       pixelSendingDelay();
     }
+#endif
+
     endOfLine();
   }
 }
