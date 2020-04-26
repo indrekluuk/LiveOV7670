@@ -1,0 +1,5 @@
+(sym_lib_table
+  (lib (name camera_ov7670)(type Legacy)(uri ${KIPRJMOD}/LibMod/Indrek/camera_ov7670.lib)(options "")(descr ""))
+  (lib (name tft_1.8inch)(type Legacy)(uri ${KIPRJMOD}/LibMod/Indrek/tft_1.8inch.lib)(options "")(descr ""))
+  (lib (name DcDcConverter)(type Legacy)(uri ${KIPRJMOD}/LibMod/Indrek/DcDcConverter.lib)(options "")(descr ""))
+)

@@ -1,0 +1,20 @@
+EESchema-LIBRARY Version 2.4
+#encoding utf-8
+#
+# DcDcConverter
+#
+DEF DcDcConverter DCDC 0 40 Y Y 1 F N
+F0 "DCDC" 0 -300 60 H V C CNN
+F1 "DcDcConverter" 0 300 60 H V C CNN
+F2 "" 0 0 60 H V C CNN
+F3 "" 0 0 60 H V C CNN
+DRAW
+S -250 200 250 -200 0 1 0 N
+X IN+ 1 -450 100 200 R 50 50 1 1 I
+X IN- 2 -450 -100 200 R 50 50 1 1 I
+X OUT+ 3 450 100 200 L 50 50 1 1 P
+X OUT- 4 450 -100 200 L 50 50 1 1 P
+ENDDRAW
+ENDDEF
+#
+#End Library
