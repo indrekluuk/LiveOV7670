@@ -121,8 +121,6 @@ void initializeScreenAndCamera() {
     sendBlankFrame(COLOR_RED);
     delay(3000);
   }
-
-  TIMSK0 = 0; // disable "millis" timer interrupt
 }
 
 
@@ -156,6 +154,7 @@ uint16_t lineBufferIndex = 0;
 void processFrame() {
   startNewFrame(uartPixelFormat);
 
+  noInterrupts();
   camera.waitForVsync();
 
   for (uint16_t y = 0; y < lineCount; y++) {
@@ -206,6 +205,7 @@ void processFrame() {
 
     endOfLine();
   }
+  interrupts();
 }
 
 

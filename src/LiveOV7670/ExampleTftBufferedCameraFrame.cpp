@@ -61,8 +61,6 @@ void initializeScreenAndCamera() {
     tft.fillScreen(ST7735_RED);
     delay(3000);
   }
-
-  TIMSK0 = 0; // disable "millis" timer interrupt
 }
 
 
@@ -87,12 +85,14 @@ uint8_t screenLineIndex;
 void processFrame() {
   screenLineIndex = screen_h;
 
+  noInterrupts();
   camera.waitForVsync();
 
   for (uint8_t i = 0; i < camera.getLineCount(); i++) {
     camera.readLine();
     sendLineToDisplay();
   }
+  interrupts();
 }
 
 
