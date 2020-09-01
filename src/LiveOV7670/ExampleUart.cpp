@@ -209,7 +209,7 @@ void processFrame() {
   }
   interrupts();
 
-  //debugPrint("Hello Arduino!");
+  debugPrint("Done!");
 }
 
 
