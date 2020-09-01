@@ -12,6 +12,7 @@
 
 static const uint8_t COMMAND_NEW_FRAME = 0x01;
 static const uint8_t COMMAND_END_OF_LINE = 0x02;
+static const uint8_t COMMAND_DEBUG_DATA = 0x03;
 
 static const uint16_t COLOR_GREEN = 0x07E0;
 static const uint16_t COLOR_RED = 0xF800;
@@ -96,6 +97,7 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YU
 void sendBlankFrame(uint16_t color);
 inline void startNewFrame(uint8_t pixelFormat) __attribute__((always_inline));
 inline void endOfLine(void) __attribute__((always_inline));
+inline void debugPrint(const char * debugText) __attribute__((always_inline));
 inline void sendNextPixelByte() __attribute__((always_inline));
 inline void sendPixelByteH(uint8_t byte) __attribute__((always_inline));
 inline void sendPixelByteL(uint8_t byte) __attribute__((always_inline));
@@ -206,6 +208,8 @@ void processFrame() {
     endOfLine();
   }
   interrupts();
+
+  //debugPrint("Hello Arduino!");
 }
 
 
@@ -240,6 +244,23 @@ void endOfLine()   {
   pixelSendingDelay();
   UDR0 = COMMAND_END_OF_LINE;
   pixelSendingDelay();
+}
+
+
+void debugPrint(const char * debugText) {
+    UDR0 = 0x00;
+    pixelSendingDelay();
+    UDR0 = COMMAND_DEBUG_DATA;
+    pixelSendingDelay();
+
+    while(*debugText) {
+        UDR0 = *debugText;
+        pixelSendingDelay();
+        debugText++;
+    }
+
+    UDR0 = COMMAND_DEBUG_DATA;
+    pixelSendingDelay();
 }
 
 
