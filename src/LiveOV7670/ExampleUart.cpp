@@ -288,12 +288,12 @@ void debugPrint(const String debugText) {
     pixelSendingDelay();
     UDR0 = COMMAND_DEBUG_DATA;
     pixelSendingDelay();
-    for (int i=0; i<debugText.length(); i++) {
+    UDR0 = debugText.length();
+    pixelSendingDelay();
+    for (uint16_t i=0; i<debugText.length(); i++) {
         UDR0 = debugText[i];
         pixelSendingDelay();
     }
-    UDR0 = COMMAND_DEBUG_DATA;
-    pixelSendingDelay();
 }
 
 
