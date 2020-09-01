@@ -97,14 +97,13 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YU
 void sendBlankFrame(uint16_t color);
 inline void startNewFrame(uint8_t pixelFormat) __attribute__((always_inline));
 inline void endOfLine(void) __attribute__((always_inline));
-inline void debugPrint(const char * debugText) __attribute__((always_inline));
 inline void sendNextPixelByte() __attribute__((always_inline));
 inline void sendPixelByteH(uint8_t byte) __attribute__((always_inline));
 inline void sendPixelByteL(uint8_t byte) __attribute__((always_inline));
 inline void sendPixelByteGrayscale(uint8_t byte) __attribute__((always_inline));
 inline void pixelSendingDelay() __attribute__((always_inline));
 
-
+inline void debugPrint(const String debugText) __attribute__((always_inline));
 
 
 // this is called in Arduino setup() function
@@ -150,6 +149,7 @@ void sendBlankFrame(uint16_t color) {
 
 uint8_t lineBuffer [lineLength*2 + 1 + 5];
 uint16_t lineBufferIndex = 0;
+uint16_t frameCounter = 0;
 
 
 // this is called in Arduino loop() function
@@ -209,7 +209,9 @@ void processFrame() {
   }
   interrupts();
 
-  debugPrint("Done!");
+  frameCounter++;
+  debugPrint("Frame " + String(frameCounter));
+  //debugPrint("Frame " + String(frameCounter, 16)); // send number in hexadecimal
 }
 
 
@@ -246,24 +248,6 @@ void endOfLine()   {
   pixelSendingDelay();
 }
 
-
-void debugPrint(const char * debugText) {
-    UDR0 = 0x00;
-    pixelSendingDelay();
-    UDR0 = COMMAND_DEBUG_DATA;
-    pixelSendingDelay();
-
-    while(*debugText) {
-        UDR0 = *debugText;
-        pixelSendingDelay();
-        debugText++;
-    }
-
-    UDR0 = COMMAND_DEBUG_DATA;
-    pixelSendingDelay();
-}
-
-
 void sendNextPixelByte() {
   if (uartPixelFormat == UART_PIXEL_FORMAT_GRAYSCALE) {
     sendPixelByteGrayscale(lineBuffer[lineBufferIndex]);
@@ -297,6 +281,20 @@ void sendPixelByteGrayscale(uint8_t byte) {
 }
 
 
+
+
+void debugPrint(const String debugText) {
+    UDR0 = 0x00;
+    pixelSendingDelay();
+    UDR0 = COMMAND_DEBUG_DATA;
+    pixelSendingDelay();
+    for (int i=0; i<debugText.length(); i++) {
+        UDR0 = debugText[i];
+        pixelSendingDelay();
+    }
+    UDR0 = COMMAND_DEBUG_DATA;
+    pixelSendingDelay();
+}
 
 
 
