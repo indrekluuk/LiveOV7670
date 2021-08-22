@@ -54,7 +54,6 @@ static const uint8_t L_BYTE_PREVENT_ZERO  = 0b00000001;
 static const uint16_t lineLength = 320;
 static const uint16_t lineCount = 240;
 static const uint32_t baud  = 2000000; // may be unreliable
-static const uint32_t uartSendWhileReadingCount  = 1;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_RGB565, 11);
 #endif
@@ -63,7 +62,6 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_R
 static const uint16_t lineLength = 320;
 static const uint16_t lineCount = 240;
 static const uint32_t baud  = 1000000;
-static const uint32_t uartSendWhileReadingCount = 2;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_RGB565, 18);
 #endif
@@ -72,7 +70,6 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_R
 static const uint16_t lineLength = 160;
 static const uint16_t lineCount = 120;
 static const uint32_t baud  = 1000000;
-static const uint32_t uartSendWhileReadingCount  = 4;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_RGB565, 5);
 #endif
@@ -81,7 +78,6 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_
 static const uint16_t lineLength = 160;
 static const uint16_t lineCount = 120;
 static const uint32_t baud  = 115200;
-static const uint32_t uartSendWhileReadingCount  = 4;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_RGB565, 35);
 #endif
@@ -90,7 +86,6 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_
 static const uint16_t lineLength = 320;
 static const uint16_t lineCount = 240;
 static const uint32_t baud  = 1000000;
-static const uint32_t uartSendWhileReadingCount = 4;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_YUV422, 10);
 #endif
@@ -99,7 +94,6 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_Y
 static const uint16_t lineLength = 160;
 static const uint16_t lineCount = 120;
 static const uint32_t baud  = 1000000;
-static const uint32_t uartSendWhileReadingCount = 0;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_YUV422, 2);
 #endif
@@ -121,6 +115,7 @@ inline void sendPixelByteH(uint8_t byte) __attribute__((always_inline));
 inline void sendPixelByteL(uint8_t byte) __attribute__((always_inline));
 inline void sendPixelByteGrayscale(uint8_t byte) __attribute__((always_inline));
 inline void waitForPreviousUartByteToBeSent() __attribute__((always_inline));
+inline bool isUartReady() __attribute__((always_inline));
 
 inline void debugPrint(const String debugText) __attribute__((always_inline));
 
@@ -153,7 +148,9 @@ void sendBlankFrame(uint16_t color) {
   startNewFrame(UART_PIXEL_FORMAT_RGB565);
   for (uint16_t j=0; j<lineCount; j++) {
     for (uint16_t i=0; i<lineLength; i++) {
+      waitForPreviousUartByteToBeSent();
       sendPixelByteH(colorH);
+      waitForPreviousUartByteToBeSent();
       sendPixelByteL(colorL);
     }
     endOfLine();
@@ -199,15 +196,9 @@ void processFrame() {
 
     for (uint16_t x = 1; x < lineLength*2+1; x++) {
       // start sending first bytes while reading pixels from camera
-      if (uartSendWhileReadingCount > 0) {
-        if (sendWhileReadCounter) {
-          sendWhileReadCounter--;
-        } else {
-          sendNextPixelByte();
-          sendWhileReadCounter = uartSendWhileReadingCount;
-        }
+      if (isUartReady() && lineBufferIndex < x) {
+        sendNextPixelByte();
       }
-
       camera.waitForPixelClockRisingEdge();
       camera.readPixelByte(lineBuffer[x]);
     }
@@ -303,18 +294,18 @@ void sendPixelByteL(uint8_t byte) {
   if (byte & L_BYTE_PARITY_CHECK) {
     byte = byte | L_BYTE_PARITY_INVERT | L_BYTE_PREVENT_ZERO;
     waitForPreviousUartByteToBeSent();
-    UDR0 = byte;    
+    UDR0 = byte;
   } else {
     byte = (byte & (~L_BYTE_PARITY_INVERT)) | L_BYTE_PREVENT_ZERO;
     waitForPreviousUartByteToBeSent();
-    UDR0 = byte;    
+    UDR0 = byte;
   }
 }
 
 void sendPixelByteGrayscale(uint8_t byte) {
   byte = byte | 0b00000001; // make pixel color always slightly above 0 since zero is end of line marker
   waitForPreviousUartByteToBeSent();
-  UDR0 = byte; 
+  UDR0 = byte;
 }
 
 
@@ -336,10 +327,12 @@ void debugPrint(const String debugText) {
 
 
 void waitForPreviousUartByteToBeSent() {
-  while(!( UCSR0A & (1<<UDRE0)));//wait for byte to transmit
+  while(!isUartReady()); //wait for byte to transmit
 }
 
-
+bool isUartReady() {
+  return UCSR0A & (1<<UDRE0);
+}
 
 
 #endif
