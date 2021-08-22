@@ -17,8 +17,27 @@ static const uint8_t COMMAND_DEBUG_DATA = 0x03;
 static const uint16_t COLOR_GREEN = 0x07E0;
 static const uint16_t COLOR_RED = 0xF800;
 
-static const uint16_t UART_PIXEL_FORMAT_RGB565 = 1;
-static const uint16_t UART_PIXEL_FORMAT_GRAYSCALE = 2;
+// Lower three bits 0b00000111.
+// Upper bits reserved for future attributes.
+static const uint16_t UART_PIXEL_FORMAT_RGB565 = 0x01;
+static const uint16_t UART_PIXEL_FORMAT_GRAYSCALE = 0x02;
+
+
+// Pixel byte parity check:
+// Pixel Byte H: odd number of bits under H_BYTE_PARITY_CHECK and H_BYTE_PARITY_INVERT
+// Pixel Byte L: even number of bits under L_BYTE_PARITY_CHECK and L_BYTE_PARITY_INVERT
+//                                          H:RRRRRGGG
+static const uint8_t H_BYTE_PARITY_CHECK =  0b00100000;
+static const uint8_t H_BYTE_PARITY_INVERT = 0b00001000;
+//                                          L:GGGBBBBB
+static const uint8_t L_BYTE_PARITY_CHECK =  0b00001000;
+static const uint8_t L_BYTE_PARITY_INVERT = 0b00100000;
+// Since the parity for L byte can be zero we must ensure that the total byet value is above zero.
+// Increasing the lowest bet of blue color is OK for that.
+static const uint8_t L_BYTE_PREVENT_ZERO  = 0b00000001;
+
+
+
 
 // select resolution and communication speed:
 // 1 - 320x240 with 2M baud (may be unreliable!)
@@ -101,7 +120,7 @@ inline void sendNextPixelByte() __attribute__((always_inline));
 inline void sendPixelByteH(uint8_t byte) __attribute__((always_inline));
 inline void sendPixelByteL(uint8_t byte) __attribute__((always_inline));
 inline void sendPixelByteGrayscale(uint8_t byte) __attribute__((always_inline));
-inline void pixelSendingDelay() __attribute__((always_inline));
+inline void waitForPreviousUartByteToBeSent() __attribute__((always_inline));
 
 inline void debugPrint(const String debugText) __attribute__((always_inline));
 
@@ -135,9 +154,7 @@ void sendBlankFrame(uint16_t color) {
   for (uint16_t j=0; j<lineCount; j++) {
     for (uint16_t i=0; i<lineLength; i++) {
       sendPixelByteH(colorH);
-      pixelSendingDelay();
       sendPixelByteL(colorL);
-      pixelSendingDelay();
     }
     endOfLine();
   }
@@ -173,9 +190,6 @@ void processFrame() {
       camera.readPixelByte(pixelByte);
       sendPixelByteGrayscale(pixelByte);
     }
-    // delay for last byte
-    pixelSendingDelay();
-
 #else
 
     lineBufferIndex = 0;
@@ -201,7 +215,6 @@ void processFrame() {
     // send rest of the line
     while (lineBufferIndex < lineLength * 2) {
       sendNextPixelByte();
-      pixelSendingDelay();
     }
 #endif
 
@@ -217,35 +230,35 @@ void processFrame() {
 
 
 void startNewFrame(uint8_t pixelFormat) {
+  waitForPreviousUartByteToBeSent();
   UDR0 = 0x00;
-  pixelSendingDelay();
+  waitForPreviousUartByteToBeSent();
   UDR0 = COMMAND_NEW_FRAME;
-  pixelSendingDelay();
 
   // frame width
+  waitForPreviousUartByteToBeSent();
   UDR0 = (lineLength >> 8) & 0xFF;
-  pixelSendingDelay();
+  waitForPreviousUartByteToBeSent();
   UDR0 = lineLength & 0xFF;
-  pixelSendingDelay();
 
   // frame height
+  waitForPreviousUartByteToBeSent();
   UDR0 = (lineCount >> 8) & 0xFF;
-  pixelSendingDelay();
+  waitForPreviousUartByteToBeSent();
   UDR0 = lineCount & 0xFF;
-  pixelSendingDelay();
 
   // pixel format
+  waitForPreviousUartByteToBeSent();
   UDR0 = (pixelFormat);
-  pixelSendingDelay();
 }
 
 
 
 void endOfLine()   {
+  waitForPreviousUartByteToBeSent();
   UDR0 = 0x00;
-  pixelSendingDelay();
+  waitForPreviousUartByteToBeSent();
   UDR0 = COMMAND_END_OF_LINE;
-  pixelSendingDelay();
 }
 
 void sendNextPixelByte() {
@@ -266,39 +279,63 @@ void sendNextPixelByte() {
 }
 
 
+// RRRRRGGG
 void sendPixelByteH(uint8_t byte) {
-  //              RRRRRGGG
-  UDR0 = byte | 0b00001000; // make pixel color always slightly above 0 since zero is end of line marker
+  // Make sure that
+  // A: pixel color always slightly above 0 since zero is end of line marker
+  // B: odd number of bits for H byte under H_BYTE_PARITY_CHECK and H_BYTE_PARITY_INVERT to enable error correction
+  if (byte & H_BYTE_PARITY_CHECK) {
+    byte = byte & (~H_BYTE_PARITY_INVERT);
+    waitForPreviousUartByteToBeSent();
+    UDR0 = byte;
+  } else {
+    byte = byte | H_BYTE_PARITY_INVERT;
+    waitForPreviousUartByteToBeSent();
+    UDR0 = byte;
+  }
 }
 
+// GGGBBBBB
 void sendPixelByteL(uint8_t byte) {
-  //              GGGBBBBB
-  UDR0 = byte | 0b00100001; // make pixel color always slightly above 0 since zero is end of line marker
+  // Make sure that
+  // A: pixel color always slightly above 0 since zero is end of line marker
+  // B: even number of bits for L byte under L_BYTE_PARITY_CHECK and L_BYTE_PARITY_INVERT to enable error correction
+  if (byte & L_BYTE_PARITY_CHECK) {
+    byte = byte | L_BYTE_PARITY_INVERT | L_BYTE_PREVENT_ZERO;
+    waitForPreviousUartByteToBeSent();
+    UDR0 = byte;    
+  } else {
+    byte = (byte & (~L_BYTE_PARITY_INVERT)) | L_BYTE_PREVENT_ZERO;
+    waitForPreviousUartByteToBeSent();
+    UDR0 = byte;    
+  }
 }
 
 void sendPixelByteGrayscale(uint8_t byte) {
-  UDR0 = byte | 0b00000001; // make pixel color always slightly above 0 since zero is end of line marker
+  byte = byte | 0b00000001; // make pixel color always slightly above 0 since zero is end of line marker
+  waitForPreviousUartByteToBeSent();
+  UDR0 = byte; 
 }
 
 
 
 
 void debugPrint(const String debugText) {
+    waitForPreviousUartByteToBeSent();
     UDR0 = 0x00;
-    pixelSendingDelay();
+    waitForPreviousUartByteToBeSent();
     UDR0 = COMMAND_DEBUG_DATA;
-    pixelSendingDelay();
+    waitForPreviousUartByteToBeSent();
     UDR0 = debugText.length();
-    pixelSendingDelay();
     for (uint16_t i=0; i<debugText.length(); i++) {
+        waitForPreviousUartByteToBeSent();
         UDR0 = debugText[i];
-        pixelSendingDelay();
     }
 }
 
 
 
-void pixelSendingDelay() {
+void waitForPreviousUartByteToBeSent() {
   while(!( UCSR0A & (1<<UDRE0)));//wait for byte to transmit
 }
 
