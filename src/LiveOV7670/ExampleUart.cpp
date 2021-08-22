@@ -31,7 +31,8 @@ static const uint16_t COLOR_RED = 0xF800;
 
 // Lower three bits 0b00000111.
 // Upper bits reserved for future attributes.
-static const uint16_t UART_PIXEL_FORMAT_RGB565 = 0x01;
+static const uint16_t UART_PIXEL_BYTE_PARITY_CHECK = 0x80;
+static const uint16_t UART_PIXEL_FORMAT_RGB565 = 0x01 | UART_PIXEL_BYTE_PARITY_CHECK; // Signal to ArduImageCapture that parity check is enabled
 static const uint16_t UART_PIXEL_FORMAT_GRAYSCALE = 0x02;
 
 
