@@ -17,7 +17,8 @@
 // 4 - 160x120 with 115200 baud
 // 5 - 320x240 grayscale with 1M baud
 // 6 - 160x120 grayscale with 1M baud
-// 7 - 640x480 grayscale with 1M baud (very unreliable)
+// 7 - 640x480 grayscale with 1M baud 
+// 8 - 640x480 grayscale with 2M baud
 #define UART_MODE 2
 
 
@@ -111,9 +112,17 @@ static const uint16_t lineCount = 480;
 static const uint32_t baud  = 1000000;
 static const bool startSendingWhileReading = true;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YUV422, 63);
+CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YUV422, 57);
 #endif
 
+#if UART_MODE==8
+static const uint16_t lineLength = 640;
+static const uint16_t lineCount = 480;
+static const uint32_t baud  = 2000000;
+static const bool startSendingWhileReading = true;
+static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
+CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YUV422, 32);
+#endif
 
 
 
@@ -122,9 +131,12 @@ uint8_t * lineBufferProcessByte;
 bool lineBufferProcessingByteFormatted;
 bool lineBufferProcessHighByte;
 uint16_t frameCounter = 0;
+uint16_t processedByteCountDuringCameraRead = 0;
 
 
 void sendBlankFrame(uint16_t color);
+void processGrayscaleFrame();
+void processRgbFrame();
 inline void startNewFrame(uint8_t pixelFormat) __attribute__((always_inline));
 inline void endOfLine(void) __attribute__((always_inline));
 inline void processNextGrayscalePixelByte() __attribute__((always_inline));
@@ -157,8 +169,6 @@ void initializeScreenAndCamera() {
 }
 
 
-
-
 void sendBlankFrame(uint16_t color) {
   uint8_t colorH = (color >> 8) & 0xFF;
   uint8_t colorL = color & 0xFF;
@@ -180,66 +190,154 @@ void sendBlankFrame(uint16_t color) {
 
 // this is called in Arduino loop() function
 void processFrame() {
+  processedByteCountDuringCameraRead = 0;
   startNewFrame(uartPixelFormat);
-
   noInterrupts();
-  camera.waitForVsync();
-  int processedByteCountDuringCameraRead = 0;
-  for (uint16_t y = 0; y < lineCount; y++) {
-    lineBuffer[0] = 0; // first byte from Camera is half a pixel
-
-    if (uartPixelFormat == UART_PIXEL_FORMAT_GRAYSCALE) {
-
-      lineBufferProcessByte = &lineBuffer[0];
-
-      for (uint16_t x = 0; x < lineLength; x++) {
-        camera.waitForPixelClockRisingEdge(); // ignore first pixel byte
-        camera.waitForPixelClockRisingEdge(); // second byte is grayscale byte
-        camera.readPixelByte(lineBuffer[x]);
-        if (startSendingWhileReading) {
-          processNextGrayscalePixelByte();
-        }
-      }
-
-      // Debug info to get some feedback how mutch data was processed during line read.
-      processedByteCountDuringCameraRead = lineBufferProcessByte - (&lineBuffer[0]);
-
-      // send rest of the line
-      while (lineBufferProcessByte < &lineBuffer[lineLength]) {
-        processNextGrayscalePixelByte();
-      }
-
-    } else {
-
-      lineBufferProcessByte = &lineBuffer[0];
-      lineBufferProcessingByteFormatted = false;
-      lineBufferProcessHighByte = true; // Always start with high byte
-
-      for (uint16_t x = 1; x < lineLength*2+1; x++) {
-        camera.waitForPixelClockRisingEdge();
-        camera.readPixelByte(lineBuffer[x]);
-        if (startSendingWhileReading) {
-          processNextRgbPixelByte();
-        }
-      }
-
-      // Debug info to get some feedback how mutch data was processed during line read.
-      processedByteCountDuringCameraRead = lineBufferProcessByte - (&lineBuffer[0]);
-
-      // send rest of the line
-      while (lineBufferProcessByte < &lineBuffer[lineLength * 2]) {
-        processNextRgbPixelByte();
-      }
-    }
-
-    endOfLine();
+    
+  if (uartPixelFormat == UART_PIXEL_FORMAT_GRAYSCALE) {
+    processGrayscaleFrame();
+  } else {
+    processRgbFrame();
   }
-  interrupts();
 
+  interrupts();
   frameCounter++;
   debugPrint("Frame " + String(frameCounter) + " " + String(processedByteCountDuringCameraRead));
   //debugPrint("Frame " + String(frameCounter, 16)); // send number in hexadecimal
 }
+
+
+void processGrayscaleFrame() {
+  uint16_t y = 0;
+  camera.waitForVsync();
+  do {
+    lineBufferProcessByte = &lineBuffer[0];
+    // Wait for first pixel byte as close to the Vsync as possible so we won't miss it.
+    camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
+
+    for (uint16_t x = 1; x < lineLength; x++) {
+      camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
+      camera.readPixelByte(lineBuffer[x]);
+
+      camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
+      if (startSendingWhileReading) {
+        // Process data sending while we are ignoreing the color byte.
+        processNextGrayscalePixelByte();
+      }
+    }
+
+    // Debug info to get some feedback how mutch data was processed during line read.
+    processedByteCountDuringCameraRead = lineBufferProcessByte - (&lineBuffer[0]);
+
+    // send rest of the line
+    while (lineBufferProcessByte < &lineBuffer[lineLength]) {
+      processNextGrayscalePixelByte();
+    }
+ 
+    endOfLine();
+    
+    y++;
+  } while (y < lineCount);
+}
+
+void processNextGrayscalePixelByte() {
+  if (isUartReady()) {
+    *lineBufferProcessByte = formatPixelByteGrayscale(*lineBufferProcessByte);
+    UDR0 = *lineBufferProcessByte;
+    lineBufferProcessByte++;    
+  }
+}
+
+uint8_t formatPixelByteGrayscale(uint8_t pixelByte) {
+  return pixelByte | 0b00000001; // make pixel color always slightly above 0 since zero is end of line marker
+}
+
+
+
+
+void processRgbFrame() {
+  uint16_t y = 0;
+  camera.waitForVsync();
+  do {
+    lineBuffer[0] = 0; // first byte from Camera is half a pixel
+
+    lineBufferProcessByte = &lineBuffer[0];
+    lineBufferProcessingByteFormatted = false;
+    lineBufferProcessHighByte = true; // Always start with high byte
+
+    for (uint16_t x = 1; x < lineLength*2 + 1; x++) {
+      camera.waitForPixelClockRisingEdge();
+      camera.readPixelByte(lineBuffer[x]);
+      if (startSendingWhileReading) {
+        processNextRgbPixelByte();
+      }
+    }
+
+    // Debug info to get some feedback how mutch data was processed during line read.
+    processedByteCountDuringCameraRead = lineBufferProcessByte - (&lineBuffer[0]);
+
+    // send rest of the line
+    while (lineBufferProcessByte < &lineBuffer[lineLength * 2]) {
+      processNextRgbPixelByte();
+    }
+
+    endOfLine();
+    
+    y++;
+  } while (y < lineCount);
+}
+
+
+void processNextRgbPixelByte() {
+  // Format pixel bytes and send out in different cycles.
+  // There is not enough time to do both on faster frame rates.
+  if (!lineBufferProcessingByteFormatted) {
+    if (lineBufferProcessHighByte) {
+      *lineBufferProcessByte = formatRgbPixelByteH(*lineBufferProcessByte);
+    } else {
+      *lineBufferProcessByte = formatRgbPixelByteL(*lineBufferProcessByte);
+    }
+    lineBufferProcessingByteFormatted = true;
+    lineBufferProcessHighByte = !lineBufferProcessHighByte;
+    
+  } else if (isUartReady()) {
+    UDR0 = *lineBufferProcessByte;
+    lineBufferProcessByte++;
+    lineBufferProcessingByteFormatted = false;
+  }
+}
+
+
+// RRRRRGGG
+uint8_t formatRgbPixelByteH(uint8_t pixelByteH) {
+  // Make sure that
+  // A: pixel color always slightly above 0 since zero is end of line marker
+  // B: odd number of bits for H byte under H_BYTE_PARITY_CHECK and H_BYTE_PARITY_INVERT to enable error correction
+  if (pixelByteH & H_BYTE_PARITY_CHECK) {
+    return pixelByteH & (~H_BYTE_PARITY_INVERT);
+  } else {
+    return pixelByteH | H_BYTE_PARITY_INVERT;
+  }
+}
+
+
+// GGGBBBBB
+uint8_t formatRgbPixelByteL(uint8_t pixelByteL) {
+  // Make sure that
+  // A: pixel color always slightly above 0 since zero is end of line marker
+  // B: even number of bits for L byte under L_BYTE_PARITY_CHECK and L_BYTE_PARITY_INVERT to enable error correction
+  if (pixelByteL & L_BYTE_PARITY_CHECK) {
+    return pixelByteL | L_BYTE_PARITY_INVERT | L_BYTE_PREVENT_ZERO;
+  } else {
+    return (pixelByteL & (~L_BYTE_PARITY_INVERT)) | L_BYTE_PREVENT_ZERO;
+  }
+}
+
+
+
+
+
+
 
 
 
@@ -277,66 +375,6 @@ void endOfLine()   {
 
 
 
-void processNextRgbPixelByte() {
-  // Format pixel bytes and send out in different cycles.
-  // There is not enough time to do both on faster frame rates.
-  if (!lineBufferProcessingByteFormatted) {
-    if (lineBufferProcessHighByte) {
-      *lineBufferProcessByte = formatRgbPixelByteH(*lineBufferProcessByte);
-    } else {
-      *lineBufferProcessByte = formatRgbPixelByteL(*lineBufferProcessByte);
-    }
-    lineBufferProcessingByteFormatted = true;
-    lineBufferProcessHighByte = !lineBufferProcessHighByte;
-    
-  } else if (isUartReady()) {
-    UDR0 = *lineBufferProcessByte;
-    lineBufferProcessByte++;
-    lineBufferProcessingByteFormatted = false;
-  }
-}
-
-
-// RRRRRGGG
-uint8_t formatRgbPixelByteH(uint8_t pixelByteH) {
-  // Make sure that
-  // A: pixel color always slightly above 0 since zero is end of line marker
-  // B: odd number of bits for H byte under H_BYTE_PARITY_CHECK and H_BYTE_PARITY_INVERT to enable error correction
-  if (pixelByteH & H_BYTE_PARITY_CHECK) {
-    return pixelByteH & (~H_BYTE_PARITY_INVERT);
-  } else {
-    return pixelByteH | H_BYTE_PARITY_INVERT;
-  }
-}
-
-// GGGBBBBB
-uint8_t formatRgbPixelByteL(uint8_t pixelByteL) {
-  // Make sure that
-  // A: pixel color always slightly above 0 since zero is end of line marker
-  // B: even number of bits for L byte under L_BYTE_PARITY_CHECK and L_BYTE_PARITY_INVERT to enable error correction
-  if (pixelByteL & L_BYTE_PARITY_CHECK) {
-    return pixelByteL | L_BYTE_PARITY_INVERT | L_BYTE_PREVENT_ZERO;
-  } else {
-    return (pixelByteL & (~L_BYTE_PARITY_INVERT)) | L_BYTE_PREVENT_ZERO;
-  }
-}
-
-
-void processNextGrayscalePixelByte() {
-  if (isUartReady()) {
-    *lineBufferProcessByte = formatPixelByteGrayscale(*lineBufferProcessByte);
-    UDR0 = *lineBufferProcessByte;
-    lineBufferProcessByte++;    
-  }
-}
-
-uint8_t formatPixelByteGrayscale(uint8_t pixelByte) {
-  return pixelByte | 0b00000001; // make pixel color always slightly above 0 since zero is end of line marker
-}
-
-
-
-
 void debugPrint(const String debugText) {
     waitForPreviousUartByteToBeSent();
     UDR0 = 0x00;
@@ -355,6 +393,7 @@ void debugPrint(const String debugText) {
 void waitForPreviousUartByteToBeSent() {
   while(!isUartReady()); //wait for byte to transmit
 }
+
 
 bool isUartReady() {
   return UCSR0A & (1<<UDRE0);
