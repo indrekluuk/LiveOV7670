@@ -28,6 +28,8 @@ public:
     static const RegisterData regsQVGA[];
     static const RegisterData regsVGA[];
 
+    static const uint8_t VGA_VERTICAL_PADDING;
+
     CameraOV7670Registers(const uint8_t i2cAddress);
 
     void init();
