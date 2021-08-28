@@ -23,7 +23,8 @@
 
 
 
-static const uint8_t COMMAND_NEW_FRAME = 0x01;
+static const uint8_t VERSION = 0x00;
+static const uint8_t COMMAND_NEW_FRAME = 0x01 | VERSION;
 static const uint8_t COMMAND_END_OF_LINE = 0x02;
 static const uint8_t COMMAND_DEBUG_DATA = 0x03;
 
@@ -112,7 +113,7 @@ static const uint16_t lineCount = 480;
 static const uint32_t baud  = 1000000;
 static const bool startSendingWhileReading = true;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YUV422, 57);
+CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YUV422, 63);
 #endif
 
 #if UART_MODE==8
@@ -129,7 +130,7 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YU
 uint8_t lineBuffer [lineLength*2 + 1]; // +1 because there is a half-pixel at the beginning of the line.
 uint8_t * lineBufferProcessByte;
 bool lineBufferProcessingByteFormatted;
-bool lineBufferProcessHighByte;
+bool lineBufferProcessParityFirstByte;
 uint16_t frameCounter = 0;
 uint16_t processedByteCountDuringCameraRead = 0;
 
@@ -210,6 +211,7 @@ void processFrame() {
 void processGrayscaleFrame() {
   uint16_t y = 0;
   camera.waitForVsync();
+  camera.ignoreVerticalPadding();
   do {
     lineBufferProcessByte = &lineBuffer[0];
     // Wait for first pixel byte as close to the Vsync as possible so we won't miss it.
@@ -235,7 +237,7 @@ void processGrayscaleFrame() {
     }
  
     endOfLine();
-    
+
     y++;
   } while (y < lineCount);
 }
@@ -258,12 +260,13 @@ uint8_t formatPixelByteGrayscale(uint8_t pixelByte) {
 void processRgbFrame() {
   uint16_t y = 0;
   camera.waitForVsync();
+  camera.ignoreVerticalPadding();
   do {
     lineBuffer[0] = 0; // first byte from Camera is half a pixel
 
     lineBufferProcessByte = &lineBuffer[0];
     lineBufferProcessingByteFormatted = false;
-    lineBufferProcessHighByte = true; // Always start with high byte
+    lineBufferProcessParityFirstByte = true; // Always start with high byte
 
     for (uint16_t x = 1; x < lineLength*2 + 1; x++) {
       camera.waitForPixelClockRisingEdge();
@@ -282,7 +285,7 @@ void processRgbFrame() {
     }
 
     endOfLine();
-    
+
     y++;
   } while (y < lineCount);
 }
@@ -292,13 +295,13 @@ void processNextRgbPixelByte() {
   // Format pixel bytes and send out in different cycles.
   // There is not enough time to do both on faster frame rates.
   if (!lineBufferProcessingByteFormatted) {
-    if (lineBufferProcessHighByte) {
+    if (lineBufferProcessParityFirstByte) {
       *lineBufferProcessByte = formatRgbPixelByteH(*lineBufferProcessByte);
     } else {
       *lineBufferProcessByte = formatRgbPixelByteL(*lineBufferProcessByte);
     }
     lineBufferProcessingByteFormatted = true;
-    lineBufferProcessHighByte = !lineBufferProcessHighByte;
+    lineBufferProcessParityFirstByte = !lineBufferProcessParityFirstByte;
     
   } else if (isUartReady()) {
     UDR0 = *lineBufferProcessByte;
