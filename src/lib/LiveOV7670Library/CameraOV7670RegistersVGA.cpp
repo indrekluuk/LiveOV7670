@@ -1,7 +1,6 @@
 //
 // Created by indrek on 17.04.2016.
 //
-
 #include "CameraOV7670Registers.h"
 
 // First few lines are garbage.

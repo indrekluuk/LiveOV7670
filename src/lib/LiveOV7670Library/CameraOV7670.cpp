@@ -42,10 +42,12 @@ bool CameraOV7670::setUpCamera() {
         break;
       case RESOLUTION_QVGA_320x240:
         registers.setRegisters(CameraOV7670Registers::regsQVGA);
+        verticalPadding = CameraOV7670Registers::QVGA_VERTICAL_PADDING;
         break;
       default:
       case RESOLUTION_QQVGA_160x120:
         registers.setRegisters(CameraOV7670Registers::regsQQVGA);
+        verticalPadding = CameraOV7670Registers::QQVGA_VERTICAL_PADDING;
         break;
     }
 
