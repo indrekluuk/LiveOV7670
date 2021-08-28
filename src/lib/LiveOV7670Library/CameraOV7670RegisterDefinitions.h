@@ -102,6 +102,8 @@ struct RegisterData {
 #define	COM13_UVSAT	0x40	/* UV saturation auto adjustment */
 #define COM13_UVSWAP	0x01	/* V before U - w/TSLB */
 #define REG_COM14	0x3e	/* Control 14 */
+#define SCALING_DCWCTR	0x72	/* DCW Control */
+#define SCALING_PCLK_DIV 0x73	/* DCW Control */
 #define COM14_DCWEN	0x10	/* DCW/PCLK-scale enable */
 #define REG_EDGE	0x3f	/* Edge enhancement factor */
 #define REG_COM15	0x40	/* Control 15 */

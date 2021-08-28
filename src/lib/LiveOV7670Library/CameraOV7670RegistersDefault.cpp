@@ -24,7 +24,7 @@ const PROGMEM RegisterData CameraOV7670Registers::regsDefault [] = { //from the 
                          {REG_COM3, 0},	{REG_COM14, 0},
     /* Mystery scaling numbers */
                          {0x70, 0x3a},		{0x71, 0x35},
-                         {0x72, 0x11},		{0x73, 0xf0},
+                         {SCALING_DCWCTR, 0x11},		{SCALING_PCLK_DIV, 0xf0},
                          {0xa2,/* 0x02 changed to 1*/1},
                          {REG_COM10, 0},
     /* Gamma curve values */

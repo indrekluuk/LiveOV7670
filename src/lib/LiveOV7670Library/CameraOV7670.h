@@ -184,6 +184,10 @@ public:
         registers(i2cAddress) {};
 
     bool init();
+    bool setRegister(uint8_t addr, uint8_t val);
+    uint8_t readRegister(uint8_t addr);
+    void setRegisterBitsOR(uint8_t addr, uint8_t bits);
+    void setRegisterBitsAND(uint8_t addr, uint8_t bits);
     void setManualContrastCenter(uint8_t center);
     void setContrast(uint8_t contrast);
     void setBrightness(uint8_t birghtness);

@@ -60,6 +60,21 @@ bool CameraOV7670::setUpCamera() {
 }
 
 
+bool CameraOV7670::setRegister(uint8_t addr, uint8_t val) {
+  registers.setRegister(addr, val);
+}
+
+uint8_t CameraOV7670::readRegister(uint8_t addr) {
+  return registers.readRegister(addr);
+}
+
+void CameraOV7670::setRegisterBitsOR(uint8_t addr, uint8_t bits) {
+  registers.setRegisterBitsOR(addr, bits);
+}
+
+void CameraOV7670::setRegisterBitsAND(uint8_t addr, uint8_t bits) {
+  registers.setRegisterBitsAND(addr, bits);
+}
 
 void CameraOV7670::setManualContrastCenter(uint8_t contrastCenter) {
   registers.setManualContrastCenter(contrastCenter);

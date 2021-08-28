@@ -11,9 +11,9 @@
 const PROGMEM RegisterData CameraOV7670Registers::regsQVGA [] = {
     {REG_COM3, COM3_DCWEN}, // enable downsamp/crop/window
 
-    {REG_COM14, 0x19},
-    {0x72, 0x11},
-    {0x73, 0xf1},
+    {REG_COM14, 0x19},        // divide by 2
+    {SCALING_DCWCTR, 0x11},   // downsample by 2
+    {SCALING_PCLK_DIV, 0xf1}, // divide by 2
     {REG_HSTART,0x16},
     {REG_HSTOP,0x04},
     {REG_HREF,0x24},
