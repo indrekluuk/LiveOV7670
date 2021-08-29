@@ -10,8 +10,10 @@ const uint8_t CameraOV7670Registers::QQVGA_VERTICAL_PADDING = 2;
 const uint16_t vstart = 0;
 const uint16_t vstop = 120 + CameraOV7670Registers::QQVGA_VERTICAL_PADDING;
 
-const uint16_t hstart = 184; // 158;
-const uint16_t hstop = 40; //14;
+// It seems that value hstart-hstop=144 is 480 pixels.
+const uint16_t hstart = 186;
+const uint16_t hstop = 46;
+// 144-4 = 140 adds one additional pixel for padding for QQVGA
 
 const PROGMEM RegisterData CameraOV7670Registers::regsQQVGA [] = {
     {REG_VSTART,vstart},
@@ -19,7 +21,7 @@ const PROGMEM RegisterData CameraOV7670Registers::regsQQVGA [] = {
     {REG_VREF,0},
     {REG_HSTART,hstart >> 3},
     {REG_HSTOP,hstop >> 3},
-    {REG_HREF,0b10000000 | (hstart & 0b111) | ((hstop & 0b111) << 3)}, // Note sure the 0b11000000 is necessary.
+    {REG_HREF,0b00000000 | (hstart & 0b111) | ((hstop & 0b111) << 3)},
 
     {REG_COM3, COM3_DCWEN}, // enable downsamp/crop/window
     {REG_COM14, 0x1a},        // divide by 4

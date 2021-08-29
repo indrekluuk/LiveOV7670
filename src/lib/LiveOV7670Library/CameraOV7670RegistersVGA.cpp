@@ -10,8 +10,10 @@ const uint8_t CameraOV7670Registers::VGA_VERTICAL_PADDING = 10;
 const uint16_t vstart = 0;
 const uint16_t vstop = 480 + CameraOV7670Registers::VGA_VERTICAL_PADDING;
 
+// It seems that value hstart-hstop=144 is 480 pixels.
 const uint16_t hstart = 158;
 const uint16_t hstop = 14;
+
 
 const PROGMEM RegisterData CameraOV7670Registers::regsVGA [] = {
     {REG_VSTART,vstart >> 2},

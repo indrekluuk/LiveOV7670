@@ -43,11 +43,15 @@ bool CameraOV7670::setUpCamera() {
       case RESOLUTION_QVGA_320x240:
         registers.setRegisters(CameraOV7670Registers::regsQVGA);
         verticalPadding = CameraOV7670Registers::QVGA_VERTICAL_PADDING;
+        horizontalBytePaddingLeft = 1;
+        horizontalBytePaddingRight = 1;
         break;
       default:
       case RESOLUTION_QQVGA_160x120:
         registers.setRegisters(CameraOV7670Registers::regsQQVGA);
         verticalPadding = CameraOV7670Registers::QQVGA_VERTICAL_PADDING;
+        horizontalBytePaddingLeft = 1;
+        horizontalBytePaddingRight = 1;
         break;
     }
 
@@ -102,6 +106,27 @@ void CameraOV7670::showColorBars(bool transparent) {
   registers.setShowColorBar(transparent);
 }
 
+void CameraOV7670::ignoreVerticalPadding() {
+  for (uint8_t i = 0; i < verticalPadding; i++) {
+    for (uint16_t x = 0; x < resolution * 2 + horizontalBytePaddingLeft + horizontalBytePaddingRight - 1; x++) {
+      waitForPixelClockRisingEdge();
+    }
+    // After the last pixel byte of a line there is a very small pixel clock pulse.
+    // To avoid accidentally counting this small pulse we measure the length of the
+    // last pulse and then wait the same time to add a byte wide delay at the
+    // end of the line.
+    volatile uint16_t pixelTime = 0;
+    while(OV7670_PIXEL_CLOCK) pixelTime++;
+    while(!OV7670_PIXEL_CLOCK) pixelTime++;
+    while(pixelTime) pixelTime--;
+  }
+}
+
+void CameraOV7670::ignoreHorizontalPaddingLeft() {
+  for (uint8_t x = 0; x < horizontalBytePaddingLeft; x++) {
+    waitForPixelClockRisingEdge();
+  }
+}
 
 
 

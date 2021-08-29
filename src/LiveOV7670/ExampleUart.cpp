@@ -127,7 +127,7 @@ CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YU
 
 
 
-uint8_t lineBuffer [lineLength*2 + 1]; // +1 because there is a half-pixel at the beginning of the line.
+uint8_t lineBuffer [lineLength*2]; // Two bytes per pixel
 uint8_t * lineBufferProcessByte;
 bool lineBufferProcessingByteFormatted;
 bool lineBufferProcessParityFirstByte;
@@ -214,10 +214,10 @@ void processGrayscaleFrame() {
   camera.ignoreVerticalPadding();
   do {
     lineBufferProcessByte = &lineBuffer[0];
-    // Wait for first pixel byte as close to the Vsync as possible so we won't miss it.
-    camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
+    
+    camera.ignoreHorizontalPaddingLeft();
 
-    for (uint16_t x = 1; x < lineLength; x++) {
+    for (uint16_t x = 0; x < lineLength - 1; x++) {
       camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
       camera.readPixelByte(lineBuffer[x]);
 
@@ -262,13 +262,13 @@ void processRgbFrame() {
   camera.waitForVsync();
   camera.ignoreVerticalPadding();
   do {
-    lineBuffer[0] = 0; // first byte from Camera is half a pixel
-
     lineBufferProcessByte = &lineBuffer[0];
     lineBufferProcessingByteFormatted = false;
     lineBufferProcessParityFirstByte = true; // Always start with high byte
 
-    for (uint16_t x = 1; x < lineLength*2 + 1; x++) {
+    camera.ignoreHorizontalPaddingLeft();
+
+    for (uint16_t x = 0; x < lineLength*2; x++) {
       camera.waitForPixelClockRisingEdge();
       camera.readPixelByte(lineBuffer[x]);
       if (startSendingWhileReading) {
