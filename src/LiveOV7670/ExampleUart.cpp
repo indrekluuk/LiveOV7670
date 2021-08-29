@@ -217,7 +217,7 @@ void processGrayscaleFrame() {
     
     camera.ignoreHorizontalPaddingLeft();
 
-    for (uint16_t x = 0; x < lineLength - 1; x++) {
+    for (uint16_t x = 0; x < lineLength; x++) {
       camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
       camera.readPixelByte(lineBuffer[x]);
 
