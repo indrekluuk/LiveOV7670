@@ -38,6 +38,3 @@ void processFrame();
 
 
 #endif //LIVEOV7670_SETUP_H
-
-
-

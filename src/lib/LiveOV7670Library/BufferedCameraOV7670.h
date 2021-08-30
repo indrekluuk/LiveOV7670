@@ -41,7 +41,7 @@ public:
   BufferedCameraOV7670(Resolution resolution, PixelFormat format, uint8_t internalClockPreScaler, PLLMultiplier pllMultiplier = PLL_MULTIPLIER_BYPASS) :
       CameraOV7670(resolution, format, internalClockPreScaler, pllMultiplier) {};
 
-  virtual inline void readLine() __attribute__((always_inline));
+  virtual void readLine();
 
   inline static constexpr Tx getLineLength() __attribute__((always_inline));
   inline static constexpr Ty getLineCount() __attribute__((always_inline));

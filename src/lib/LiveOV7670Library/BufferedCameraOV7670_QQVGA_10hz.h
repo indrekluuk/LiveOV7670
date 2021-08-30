@@ -15,7 +15,8 @@ class BufferedCameraOV7670_QQVGA_10hz : public BufferedCameraOV7670<uint16_t, 32
 public:
   BufferedCameraOV7670_QQVGA_10hz(PixelFormat format) : BufferedCameraOV7670(Resolution::RESOLUTION_QQVGA_160x120, format, 0) {};
 
-  inline void readLine() override __attribute__((always_inline));
+  void ignoreVerticalPadding() override;
+  void readLine() override;
 
 
 private:
@@ -26,6 +27,11 @@ private:
 };
 
 
+void BufferedCameraOV7670_QQVGA_10hz::ignoreVerticalPadding() {
+  for (uint8_t i = 0; i < verticalPadding; i++) {
+    readLine();
+  }
+}
 
 
 void BufferedCameraOV7670_QQVGA_10hz::readLine() {

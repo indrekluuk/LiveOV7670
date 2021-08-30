@@ -87,6 +87,7 @@ void processFrame() {
 
   noInterrupts();
   camera.waitForVsync();
+  camera.ignoreVerticalPadding();
 
   for (uint8_t i = 0; i < camera.getLineCount(); i++) {
     camera.readLine();

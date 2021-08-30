@@ -203,7 +203,7 @@ public:
     inline void waitForPixelClockHigh(void) __attribute__((always_inline));
     inline void readPixelByte(uint8_t & byte) __attribute__((always_inline));
 
-    void ignoreVerticalPadding();
+    virtual void ignoreVerticalPadding();
     void ignoreHorizontalPaddingLeft();
 
 protected:

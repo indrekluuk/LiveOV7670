@@ -14,7 +14,7 @@ class BufferedCameraOV7670_QQVGA_20hz_Grayscale : public BufferedCameraOV7670<ui
 public:
     BufferedCameraOV7670_QQVGA_20hz_Grayscale() : BufferedCameraOV7670(RESOLUTION_QQVGA_160x120, PIXEL_YUV422, 1, PLL_MULTIPLIER_X4) {};
 
-    inline void readLine() override __attribute__((always_inline));
+    void readLine();
     void isrReadLine();
 
 protected:

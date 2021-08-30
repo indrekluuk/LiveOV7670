@@ -30,7 +30,7 @@ public:
       framesPerSecond(fps)
   {};
 
-  inline void readLine() override __attribute__((always_inline));
+  void readLine() override;
 
 
 private:

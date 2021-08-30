@@ -13,15 +13,9 @@ class BufferedCameraOV7670_QQVGA_10hz_Grayscale : public BufferedCameraOV7670<ui
 
 
 public:
-    BufferedCameraOV7670_QQVGA_10hz_Grayscale() : BufferedCameraOV7670(Resolution::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_YUV422, 0) {};
+  BufferedCameraOV7670_QQVGA_10hz_Grayscale() : BufferedCameraOV7670(Resolution::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_YUV422, 0) {};
 
-  inline void readLine() override __attribute__((always_inline));
-
-
-private:
-  inline void readPixels_unrolled_x160(uint16_t byteIndex) __attribute__((always_inline));
-  inline void readPixels_unrolled_x10(uint16_t byteIndex) __attribute__((always_inline));
-  inline void readPixel_unrolled(uint16_t byteIndex) __attribute__((always_inline));
+  void readLine() override;
 
 };
 
