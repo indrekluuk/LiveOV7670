@@ -71,11 +71,12 @@ void BufferedCameraOV7670_QQVGA::readLine() {
     pixelBuffer.writeBufferPadding = 0;
     uint16_t bufferIndex = 0;
 
+    waitForPixelClockLow();
     while (bufferIndex < getPixelBufferLength()) {
-      waitForPixelClockLow();
       readPixelByte(pixelBuffer.writeBuffer[bufferIndex++]);
       waitForPixelClockLow();
       readPixelByte(pixelBuffer.writeBuffer[bufferIndex++]);
+      waitForPixelClockLow();
     }
 
   } else {
