@@ -54,8 +54,12 @@ private:
 
 
 void BufferedCameraOV7670_QQVGA::ignoreVerticalPadding() {
-  for (uint8_t i = 0; i < verticalPadding; i++) {
-    readLine();
+  if (framesPerSecond == FPS_5_Hz) {
+    for (uint8_t i = 0; i < verticalPadding; i++) {
+      readLine();
+    }
+  } else {
+    CameraOV7670::ignoreVerticalPadding();
   }
 }
 
