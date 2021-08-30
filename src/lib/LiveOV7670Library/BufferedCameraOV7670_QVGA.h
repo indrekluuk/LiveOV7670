@@ -31,6 +31,7 @@ public:
   {};
 
 
+  void ignoreVerticalPadding() override;
   void readLine() override;
 
 
@@ -57,6 +58,15 @@ private:
 
 
 
+void BufferedCameraOV7670_QVGA::ignoreVerticalPadding() {
+  if (framesPerSecond == FPS_2p5_Hz) {
+    for (uint8_t i = 0; i < verticalPadding; i++) {
+      readLine();
+    }
+  } else {
+    CameraOV7670::ignoreVerticalPadding();
+  }
+}
 
 
 void BufferedCameraOV7670_QVGA::readLine() {
@@ -67,17 +77,12 @@ void BufferedCameraOV7670_QVGA::readLine() {
     uint16_t bufferIndex = 0;
 
     waitForPixelClockLow();
+
     while (bufferIndex < getPixelBufferLength()) {
-      asm volatile("nop");
-      asm volatile("nop");
-      asm volatile("nop");
       readPixelByte(pixelBuffer.writeBuffer[bufferIndex++]);
-      asm volatile("nop");
-      asm volatile("nop");
-      asm volatile("nop");
-      asm volatile("nop");
-      asm volatile("nop");
+      waitForPixelClockLow();
       readPixelByte(pixelBuffer.writeBuffer[bufferIndex++]);
+      waitForPixelClockLow();
     }
 
   } else {
