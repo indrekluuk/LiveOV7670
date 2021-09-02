@@ -10,8 +10,9 @@ const uint8_t CameraOV7670Registers::QVGA_VERTICAL_PADDING = 5;
 const uint16_t vstart = 0;
 const uint16_t vstop = 240 + CameraOV7670Registers::QVGA_VERTICAL_PADDING;
 
-// 240 + 1 pixel (2 bytes) for padding.
-const uint16_t hstart = 176;
+// 240 + 2 pixel (4 bytes) for padding.
+// One from the beginning and three at the end.
+const uint16_t hstart = 174;
 const uint16_t hstop = 34;
 
 const PROGMEM RegisterData CameraOV7670Registers::regsQVGA [] = {

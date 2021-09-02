@@ -162,15 +162,12 @@ public:
 protected:
     static const uint8_t i2cAddress = 0x21;
 
-    Resolution resolution;
+    const Resolution resolution;
     PixelFormat pixelFormat;
     uint8_t internalClockPreScaler;
     PLLMultiplier pllMultiplier;
     CameraOV7670Registers registers;
     uint8_t verticalPadding = 0;
-    uint8_t horizontalBytePaddingLeft = 0;
-    uint8_t horizontalBytePaddingRight = 0;
-
 
 public:
 
@@ -201,10 +198,11 @@ public:
     inline void waitForPixelClockRisingEdge(void) __attribute__((always_inline));
     inline void waitForPixelClockLow(void) __attribute__((always_inline));
     inline void waitForPixelClockHigh(void) __attribute__((always_inline));
+    inline void ignoreHorizontalPaddingLeft(void) __attribute__((always_inline));
+    inline void ignoreHorizontalPaddingRight(void) __attribute__((always_inline));
     inline void readPixelByte(uint8_t & byte) __attribute__((always_inline));
 
     virtual void ignoreVerticalPadding();
-    void ignoreHorizontalPaddingLeft();
 
 protected:
     virtual bool setUpCamera();
@@ -231,6 +229,27 @@ void CameraOV7670::waitForPixelClockLow() {
 
 void CameraOV7670::waitForPixelClockHigh() {
   while(!OV7670_PIXEL_CLOCK);
+}
+
+// One byte at the beginning
+void CameraOV7670::ignoreHorizontalPaddingLeft() {
+  waitForPixelClockRisingEdge();
+}
+
+// Three bytes at the end
+void CameraOV7670::ignoreHorizontalPaddingRight() {
+  volatile uint16_t pixelTime = 0;
+
+  waitForPixelClockRisingEdge();
+  waitForPixelClockRisingEdge();
+
+  // After the last pixel byte of an image line there is a very small pixel clock pulse.
+  // To avoid accidentally counting this small pulse we measure the length of the
+  // last pulse and then wait the same time to add a byte wide delay at the
+  // end of the line.
+  while(OV7670_PIXEL_CLOCK) pixelTime++;
+  while(!OV7670_PIXEL_CLOCK) pixelTime++;
+  while(pixelTime) pixelTime--;
 }
 
 void CameraOV7670::readPixelByte(uint8_t & byte) {
