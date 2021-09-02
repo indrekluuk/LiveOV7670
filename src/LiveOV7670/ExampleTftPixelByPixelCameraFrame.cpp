@@ -79,46 +79,29 @@ uint8_t screenLineIndex;
 
 // this is called in Arduino loop() function
 void processFrame() {
+  uint8_t pixelByte;
   screenLineIndex = screen_h;
 
   camera.waitForVsync();
-
-  uint8_t lowByte = 0;
-  uint8_t bufferedLowByte = 0;
-
+  camera.ignoreVerticalPadding();
+  
   for (uint16_t y = 0; y < lineCount; y++) {
-
     screenLineStart();
+    camera.ignoreHorizontalPaddingLeft();
 
-    // For full VGA resolution byte order from LiveOV7670Library is low1, high1, low2, high2
-    // We have to swap byte order for the screen.
-
-    camera.waitForPixelClockRisingEdge();
-    camera.readPixelByte(bufferedLowByte);
-
-    for (uint16_t x = 0; x < lineLength-1; x++) {
+    for (uint16_t x = 0; x < lineLength; x++) {
 
       camera.waitForPixelClockRisingEdge();
-      uint8_t highByte;
-      camera.readPixelByte(highByte);
-      sendPixelByte(highByte); // send pixel high byte
+      camera.readPixelByte(pixelByte);
+      sendPixelByte(pixelByte);
 
-      lowByte = bufferedLowByte;
       camera.waitForPixelClockRisingEdge();
-       camera.readPixelByte(bufferedLowByte);
-      sendPixelByte(lowByte); // send pixel low byte
+      camera.readPixelByte(pixelByte);
+      sendPixelByte(pixelByte);
     }
 
-    // send last pixel
-    camera.waitForPixelClockRisingEdge();
-    uint8_t highByte;
-    camera.readPixelByte(highByte);
-    sendPixelByte(highByte); // send pixel high byte
+    camera.ignoreHorizontalPaddingRight();
     pixelSendingDelay(); // prevent sending collision
-    sendPixelByte(bufferedLowByte); // send pixel low byte
-    pixelSendingDelay();
-
-
     screenLineEnd();
   }
 }
