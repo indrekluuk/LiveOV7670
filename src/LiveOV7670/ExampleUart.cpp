@@ -11,7 +11,7 @@
 
 
 // select resolution and communication speed:
-// 1 - 320x240 with 2M baud (may be unreliable!)
+// 1 - 320x240 with 2M baud
 // 2 - 320x240 with 1M baud
 // 3 - 160x120 with 1M baud
 // 4 - 160x120 with 115200 baud
@@ -61,7 +61,7 @@ static const uint32_t baud  = 2000000; // may be unreliable
 static const bool isBufferedLine = true;
 static const bool isSendWhileBuffering = true;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_RGB565, 12);
+CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_RGB565, 11);
 #endif
 
 #if UART_MODE==2
@@ -71,7 +71,7 @@ static const uint32_t baud  = 1000000;
 static const bool isBufferedLine = true;
 static const bool isSendWhileBuffering = true;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_RGB565, 18);
+CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_RGB565, 16);
 #endif
 
 #if UART_MODE==3
@@ -79,7 +79,7 @@ static const uint16_t lineLength = 160;
 static const uint16_t lineCount = 120;
 static const uint32_t baud  = 1000000;
 static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = true;
+static const bool isSendWhileBuffering = false;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_RGB565, 5);
 #endif
@@ -91,7 +91,7 @@ static const uint32_t baud  = 115200;
 static const bool isBufferedLine = true;
 static const bool isSendWhileBuffering = true;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_RGB565, 35);
+CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_RGB565, 34);
 #endif
 
 #if UART_MODE==5
@@ -101,7 +101,7 @@ static const uint32_t baud  = 1000000;
 static const bool isBufferedLine = true;
 static const bool isSendWhileBuffering = true;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_YUV422, 10);
+CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_YUV422, 8);
 #endif
 
 #if UART_MODE==6
@@ -121,7 +121,7 @@ static const uint32_t baud  = 1000000;
 static const bool isBufferedLine = false;
 static const bool isSendWhileBuffering = false;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YUV422, 63);
+CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YUV422, 39);
 #endif
 
 #if UART_MODE==8
@@ -131,7 +131,7 @@ static const uint32_t baud  = 2000000;
 static const bool isBufferedLine = false;
 static const bool isSendWhileBuffering = false;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YUV422, 32);
+CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YUV422, 19);
 #endif
 
 #if UART_MODE==9
@@ -141,16 +141,18 @@ static const uint32_t baud  = 2000000;
 static const bool isBufferedLine = false;
 static const bool isSendWhileBuffering = false;
 static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_RGB565, 63);
+CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_RGB565, 39);
 #endif
 
 
 uint8_t lineBuffer [isBufferedLine ? lineLength * 2 : 1]; // Two bytes per pixel
-uint8_t * lineBufferProcessByte;
-bool lineBufferProcessingByteFormatted;
-bool lineBufferProcessParityFirstByte;
+uint8_t * lineBufferSendByte;
+bool isLineBufferSendHighByte;
+bool isLineBufferByteFormatted;
+
 uint16_t frameCounter = 0;
 uint16_t processedByteCountDuringCameraRead = 0;
+
 
 
 void sendBlankFrame(uint16_t color);
@@ -161,7 +163,9 @@ void processRgbFrameDirect();
 inline void startNewFrame(uint8_t pixelFormat) __attribute__((always_inline));
 inline void endOfLine(void) __attribute__((always_inline));
 inline void processNextGrayscalePixelByteInBuffer() __attribute__((always_inline));
-inline void processNextRgbPixelByte() __attribute__((always_inline));
+inline void processNextRgbPixelByteInBuffer() __attribute__((always_inline));
+inline void tryToSendNextRgbPixelByteInBuffer() __attribute__((always_inline));
+inline void formatNextRgbPixelByteInBuffer() __attribute__((always_inline));
 inline uint8_t formatRgbPixelByteH(uint8_t byte) __attribute__((always_inline));
 inline uint8_t formatRgbPixelByteL(uint8_t byte) __attribute__((always_inline));
 inline uint8_t formatPixelByteGrayscale(uint8_t byte) __attribute__((always_inline));
@@ -242,7 +246,7 @@ void processGrayscaleFrameBuffered() {
   camera.ignoreVerticalPadding();
 
   for (uint16_t y = 0; y < lineCount; y++) {
-    lineBufferProcessByte = &lineBuffer[0];
+    lineBufferSendByte = &lineBuffer[0];
     camera.ignoreHorizontalPaddingLeft();
 
     for (uint16_t x = 0; x < lineLength; x++) {
@@ -258,10 +262,10 @@ void processGrayscaleFrameBuffered() {
     camera.ignoreHorizontalPaddingRight();
 
     // Debug info to get some feedback how mutch data was processed during line read.
-    processedByteCountDuringCameraRead = lineBufferProcessByte - (&lineBuffer[0]);
+    processedByteCountDuringCameraRead = lineBufferSendByte - (&lineBuffer[0]);
 
     // Send rest of the line
-    while (lineBufferProcessByte < &lineBuffer[lineLength]) {
+    while (lineBufferSendByte < &lineBuffer[lineLength]) {
       processNextGrayscalePixelByteInBuffer();
     }
  
@@ -271,10 +275,12 @@ void processGrayscaleFrameBuffered() {
 
 void processNextGrayscalePixelByteInBuffer() {
   if (isUartReady()) {
-    UDR0 = *lineBufferProcessByte;
-    lineBufferProcessByte++;    
+    UDR0 = *lineBufferSendByte;
+    lineBufferSendByte++;        
   }
 }
+
+
 
 void processGrayscaleFrameDirect() {
   camera.waitForVsync();
@@ -310,33 +316,62 @@ void processRgbFrameBuffered() {
   camera.ignoreVerticalPadding();
   
   for (uint16_t y = 0; y < lineCount; y++) {
-    lineBufferProcessByte = &lineBuffer[0];
-    lineBufferProcessingByteFormatted = false;
-    lineBufferProcessParityFirstByte = true; // Always start with high byte
+    lineBufferSendByte = &lineBuffer[0];
+    isLineBufferSendHighByte = true; // Line starts with High byte
+    isLineBufferByteFormatted = false;
 
     camera.ignoreHorizontalPaddingLeft();
 
-    for (uint16_t x = 0; x < lineLength*2; x++) {
+    for (uint16_t x = 0; x < lineLength * 2;  x++) {
       camera.waitForPixelClockRisingEdge();
       camera.readPixelByte(lineBuffer[x]);
       if (isSendWhileBuffering) {
-        processNextRgbPixelByte();
+        processNextRgbPixelByteInBuffer();
       }
-    }
+    };
 
     camera.ignoreHorizontalPaddingRight();
 
     // Debug info to get some feedback how mutch data was processed during line read.
-    processedByteCountDuringCameraRead = lineBufferProcessByte - (&lineBuffer[0]);
+    processedByteCountDuringCameraRead = lineBufferSendByte - (&lineBuffer[0]);
 
     // send rest of the line
-    while (lineBufferProcessByte < &lineBuffer[lineLength * 2]) {
-      processNextRgbPixelByte();
+    while (lineBufferSendByte < &lineBuffer[lineLength * 2]) {
+      processNextRgbPixelByteInBuffer();
     }
 
     endOfLine();
   }
 }
+
+void processNextRgbPixelByteInBuffer() {
+  // Format pixel bytes and send out in different cycles.
+  // There is not enough time to do both on faster frame rates.
+  if (isLineBufferByteFormatted) {
+    tryToSendNextRgbPixelByteInBuffer();
+  } else {
+    formatNextRgbPixelByteInBuffer();
+  }        
+}
+
+void tryToSendNextRgbPixelByteInBuffer() {
+  if (isUartReady()) {
+    UDR0 = *lineBufferSendByte;
+    lineBufferSendByte++;    
+    isLineBufferByteFormatted = false;    
+  }
+}
+
+void formatNextRgbPixelByteInBuffer() {
+  if (isLineBufferSendHighByte) {
+    *lineBufferSendByte = formatRgbPixelByteH(*lineBufferSendByte);
+  } else {
+    *lineBufferSendByte = formatRgbPixelByteL(*lineBufferSendByte);
+  }
+  isLineBufferByteFormatted = true;
+  isLineBufferSendHighByte = !isLineBufferSendHighByte;
+}
+
 
 
 
@@ -365,26 +400,6 @@ void processRgbFrameDirect() {
     camera.ignoreHorizontalPaddingRight();
     endOfLine();
   };
-}
-
-
-void processNextRgbPixelByte() {
-  // Format pixel bytes and send out in different cycles.
-  // There is not enough time to do both on faster frame rates.
-  if (!lineBufferProcessingByteFormatted) {
-    if (lineBufferProcessParityFirstByte) {
-      *lineBufferProcessByte = formatRgbPixelByteH(*lineBufferProcessByte);
-    } else {
-      *lineBufferProcessByte = formatRgbPixelByteL(*lineBufferProcessByte);
-    }
-    lineBufferProcessingByteFormatted = true;
-    lineBufferProcessParityFirstByte = !lineBufferProcessParityFirstByte;
-
-  } else if (isUartReady()) {
-    UDR0 = *lineBufferProcessByte;
-    lineBufferProcessByte++;
-    lineBufferProcessingByteFormatted = false;
-  }
 }
 
 
