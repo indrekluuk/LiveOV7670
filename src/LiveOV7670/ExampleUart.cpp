@@ -342,27 +342,28 @@ void processGrayscaleFrameBuffered() {
   for (uint16_t y = 0; y < lineCount; y++) {
     lineBufferSendByte = &lineBuffer[0];
     camera.ignoreHorizontalPaddingLeft();
-    isLineBufferSendHighByte = true;
 
-    for (uint16_t x = 0; x < lineBufferLength; x++) {
+    uint16_t x = 0;
+    while ( x < lineBufferLength) {
       camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
       camera.readPixelByte(lineBuffer[x]);
-      lineBuffer[x] = formatPixelByteGrayscaleFirst(lineBuffer[x]);
-
+      lineBuffer[x] = formatPixelByteGrayscaleFirst(lineBuffer[x]);  
+      
       camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
       if (isSendWhileBuffering) {
         processNextGrayscalePixelByteInBuffer();
       }
-
       x++;
+
       camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
       camera.readPixelByte(lineBuffer[x]);
       lineBuffer[x] = formatPixelByteGrayscaleSecond(lineBuffer[x]);
-
+      
       camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
       if (isSendWhileBuffering) {
         processNextGrayscalePixelByteInBuffer();
       }
+      x++;
     }
     camera.ignoreHorizontalPaddingRight();
 
@@ -393,7 +394,8 @@ void processGrayscaleFrameDirect() {
   for (uint16_t y = 0; y < lineCount; y++) {
     camera.ignoreHorizontalPaddingLeft();
 
-    for (uint16_t x = 0; x < lineLength / 2; x++) {
+    uint16_t x = 0;
+    while ( x < lineLength) {
       camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
       camera.readPixelByte(lineBuffer[0]);
       lineBuffer[0] = formatPixelByteGrayscaleFirst(lineBuffer[0]);
@@ -401,6 +403,7 @@ void processGrayscaleFrameDirect() {
       camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
       waitForPreviousUartByteToBeSent();
       UDR0 = lineBuffer[0];
+      x++;
 
       camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
       camera.readPixelByte(lineBuffer[0]);
@@ -409,6 +412,7 @@ void processGrayscaleFrameDirect() {
       camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
       waitForPreviousUartByteToBeSent();
       UDR0 = lineBuffer[0];
+      x++;
     }
 
     camera.ignoreHorizontalPaddingRight();
