@@ -9,9 +9,7 @@
 #include "CameraOV7670.h"
 
 
-
 // select resolution and communication speed:
-#define UART_MODE 5
 //  1 - 115200bps 160x120 rgb
 //  2 - 115200bps 160x120 grayscale
 //  3 - 500000bps 160x120 rgb
@@ -29,213 +27,237 @@
 // 15 - 2Mbps 320x240 grayscale
 // 16 - 2Mbps 640x480 rgb
 // 17 - 2Mbps 640x480 grayscale
+#define UART_MODE 5
 
 
 
-static const uint8_t VERSION = 0x00;
-static const uint8_t COMMAND_NEW_FRAME = 0x01 | VERSION;
-static const uint8_t COMMAND_END_OF_LINE = 0x02;
-static const uint8_t COMMAND_DEBUG_DATA = 0x03;
+
+const uint8_t VERSION = 0x00;
+const uint8_t COMMAND_NEW_FRAME = 0x01 | VERSION;
+const uint8_t COMMAND_END_OF_LINE = 0x02;
+const uint8_t COMMAND_DEBUG_DATA = 0x03;
 
 // Lower three bits 0b00000111.
 // Upper bits reserved for future attributes.
-static const uint16_t UART_PIXEL_BYTE_PARITY_CHECK = 0x80;
-static const uint16_t UART_PIXEL_FORMAT_RGB565 = 0x01 | UART_PIXEL_BYTE_PARITY_CHECK; // Signal to ArduImageCapture that parity check is enabled
-static const uint16_t UART_PIXEL_FORMAT_GRAYSCALE = 0x02;
+const uint16_t UART_PIXEL_BYTE_PARITY_CHECK = 0x80;
+const uint16_t UART_PIXEL_FORMAT_RGB565 = 0x01 | UART_PIXEL_BYTE_PARITY_CHECK; // Signal to ArduImageCapture that parity check is enabled
+const uint16_t UART_PIXEL_FORMAT_GRAYSCALE = 0x02 | UART_PIXEL_BYTE_PARITY_CHECK; // Signal to ArduImageCapture that parity check is enabled;
 
 // Pixel byte parity check:
 // Pixel Byte H: odd number of bits under H_BYTE_PARITY_CHECK and H_BYTE_PARITY_INVERT
 // Pixel Byte L: even number of bits under L_BYTE_PARITY_CHECK and L_BYTE_PARITY_INVERT
 //                                          H:RRRRRGGG
-static const uint8_t H_BYTE_PARITY_CHECK =  0b00100000;
-static const uint8_t H_BYTE_PARITY_INVERT = 0b00001000;
+const uint8_t H_BYTE_PARITY_CHECK =  0b00100000;
+const uint8_t H_BYTE_PARITY_INVERT = 0b00001000;
 //                                          L:GGGBBBBB
-static const uint8_t L_BYTE_PARITY_CHECK =  0b00001000;
-static const uint8_t L_BYTE_PARITY_INVERT = 0b00100000;
+const uint8_t L_BYTE_PARITY_CHECK =  0b00001000;
+const uint8_t L_BYTE_PARITY_INVERT = 0b00100000;
 // Since the parity for L byte can be zero we must ensure that the total byet value is above zero.
-// Increasing the lowest bet of blue color is OK for that.
-static const uint8_t L_BYTE_PREVENT_ZERO  = 0b00000001;
-
-static const uint16_t COLOR_GREEN = 0x07E0;
-static const uint16_t COLOR_RED = 0xF800;
+// Increasing the lowest bit of blue color is OK for that.
+const uint8_t L_BYTE_PREVENT_ZERO  = 0b00000001;
 
 
+const uint16_t COLOR_GREEN = 0x07E0;
+const uint16_t COLOR_RED = 0xF800;
+
+
+
+void processGrayscaleFrameBuffered();
+void processGrayscaleFrameDirect();
+void processRgbFrameBuffered();
+void processRgbFrameDirect();
+typedef void (*ProcessFrameData)(void) ;
 
 
 #if UART_MODE==1
-static const uint16_t lineLength = 160;
-static const uint16_t lineCount = 120;
-static const uint32_t baud  = 115200;
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = true;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
+const uint16_t lineLength = 160;
+const uint16_t lineCount = 120;
+const uint32_t baud  = 115200;
+const ProcessFrameData processFrameData = processRgbFrameBuffered;
+const uint16_t bufferLineLength = lineLength * 2;
+const bool isSendWhileBuffering = true;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_RGB565, 34);
 #endif
 
 #if UART_MODE==2
-static const uint16_t lineLength = 160;
-static const uint16_t lineCount = 120;
-static const uint32_t baud  = 115200;
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = true;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
+const uint16_t lineLength = 160;
+const uint16_t lineCount = 120;
+const uint32_t baud  = 115200;
+const ProcessFrameData processFrameData = processGrayscaleFrameBuffered;
+const uint16_t bufferLineLength = lineLength;
+const bool isSendWhileBuffering = true;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_YUV422, 17);
 #endif
 
 #if UART_MODE==3
-static const uint16_t lineLength = 160;
-static const uint16_t lineCount = 120;
-static const uint32_t baud  = 500000;
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = true;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
+const uint16_t lineLength = 160;
+const uint16_t lineCount = 120;
+const uint32_t baud  = 500000;
+const ProcessFrameData processFrameData = processRgbFrameBuffered;
+const uint16_t bufferLineLength = lineLength * 2;
+const bool isSendWhileBuffering = true;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_RGB565, 8);
 #endif
 
 #if UART_MODE==4
-static const uint16_t lineLength = 160;
-static const uint16_t lineCount = 120;
-static const uint32_t baud  = 500000;
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = true;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
+const uint16_t lineLength = 160;
+const uint16_t lineCount = 120;
+const uint32_t baud  = 500000;
+const ProcessFrameData processFrameData = processGrayscaleFrameBuffered;
+const uint16_t bufferLineLength = lineLength;
+const bool isSendWhileBuffering = true;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_YUV422, 4);
 #endif
 
 #if UART_MODE==5
-static const uint16_t lineLength = 320;
-static const uint16_t lineCount = 240;
-static const uint32_t baud  = 500000;
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = true;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
+const uint16_t lineLength = 320;
+const uint16_t lineCount = 240;
+const uint32_t baud  = 500000;
+const ProcessFrameData processFrameData = processRgbFrameBuffered;
+const uint16_t bufferLineLength = lineLength * 2;
+const bool isSendWhileBuffering = true;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_RGB565, 32);
 #endif
 
 #if UART_MODE==6
-static const uint16_t lineLength = 320;
-static const uint16_t lineCount = 240;
-static const uint32_t baud  = 500000;
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = true;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
+const uint16_t lineLength = 320;
+const uint16_t lineCount = 240;
+const uint32_t baud  = 500000;
+const ProcessFrameData processFrameData = processGrayscaleFrameBuffered;
+const uint16_t bufferLineLength = lineLength;
+const bool isSendWhileBuffering = true;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_YUV422, 16);
 #endif
 
 #if UART_MODE==7
-static const uint16_t lineLength = 160;
-static const uint16_t lineCount = 120;
-static const uint32_t baud  = 1000000;
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = false;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
+const uint16_t lineLength = 160;
+const uint16_t lineCount = 120;
+const uint32_t baud  = 1000000;
+const ProcessFrameData processFrameData = processRgbFrameBuffered;
+const uint16_t bufferLineLength = lineLength * 2;
+const bool isSendWhileBuffering = false;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_RGB565, 5);
 #endif
 
 #if UART_MODE==8
-static const uint16_t lineLength = 160;
-static const uint16_t lineCount = 120;
-static const uint32_t baud  = 1000000;
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = false;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
+const uint16_t lineLength = 160;
+const uint16_t lineCount = 120;
+const uint32_t baud  = 1000000;
+const ProcessFrameData processFrameData = processGrayscaleFrameBuffered;
+const uint16_t bufferLineLength = lineLength;
+const bool isSendWhileBuffering = false;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_YUV422, 2);
 #endif
 
 #if UART_MODE==9
-static const uint16_t lineLength = 320;
-static const uint16_t lineCount = 240;
-static const uint32_t baud  = 1000000;
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = true;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
+const uint16_t lineLength = 320;
+const uint16_t lineCount = 240;
+const uint32_t baud  = 1000000;
+const ProcessFrameData processFrameData = processRgbFrameBuffered;
+const uint16_t bufferLineLength = lineLength * 2;
+const bool isSendWhileBuffering = true;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_RGB565, 16);
 #endif
 
 #if UART_MODE==10
-static const uint16_t lineLength = 320;
-static const uint16_t lineCount = 240;
-static const uint32_t baud  = 1000000;
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = true;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
+const uint16_t lineLength = 320;
+const uint16_t lineCount = 240;
+const uint32_t baud  = 1000000;
+const ProcessFrameData processFrameData = processGrayscaleFrameBuffered;
+const uint16_t bufferLineLength = lineLength;
+const bool isSendWhileBuffering = true;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_YUV422, 8);
 #endif
 
 #if UART_MODE==11
-static const uint16_t lineLength = 640;
-static const uint16_t lineCount = 480;
-static const uint32_t baud  = 1000000;
-static const bool isBufferedLine = false;
-static const bool isSendWhileBuffering = false;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
+const uint16_t lineLength = 640;
+const uint16_t lineCount = 480;
+const uint32_t baud  = 1000000;
+const ProcessFrameData processFrameData = processGrayscaleFrameDirect;
+const uint16_t bufferLineLength = 1;
+const bool isSendWhileBuffering = true;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YUV422, 39);
 #endif
 
 #if UART_MODE==12
-static const uint16_t lineLength = 160;
-static const uint16_t lineCount = 120;
-static const uint32_t baud  = 2000000;
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = false;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
+const uint16_t lineLength = 160;
+const uint16_t lineCount = 120;
+const uint32_t baud  = 2000000;
+const ProcessFrameData processFrameData = processRgbFrameBuffered;
+const uint16_t bufferLineLength = lineLength * 2;
+const bool isSendWhileBuffering = false;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_RGB565, 2);
 #endif
 
 #if UART_MODE==13
-static const uint16_t lineLength = 160;
-static const uint16_t lineCount = 120;
-static const uint32_t baud  = 2000000;
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = false;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
+const uint16_t lineLength = 160;
+const uint16_t lineCount = 120;
+const uint32_t baud  = 2000000;
+const ProcessFrameData processFrameData = processGrayscaleFrameBuffered;
+const uint16_t bufferLineLength = lineLength;
+const bool isSendWhileBuffering = false;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QQVGA_160x120, CameraOV7670::PIXEL_YUV422, 2);
 #endif
 
 #if UART_MODE==14
-static const uint16_t lineLength = 320;
-static const uint16_t lineCount = 240;
-static const uint32_t baud  = 2000000; // may be unreliable
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = true;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
+const uint16_t lineLength = 320;
+const uint16_t lineCount = 240;
+const uint32_t baud  = 2000000; // may be unreliable
+const ProcessFrameData processFrameData = processRgbFrameBuffered;
+const uint16_t bufferLineLength = lineLength * 2;
+const bool isSendWhileBuffering = true;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_RGB565, 11);
 #endif
 
 #if UART_MODE==15
-static const uint16_t lineLength = 320;
-static const uint16_t lineCount = 240;
-static const uint32_t baud  = 2000000; // may be unreliable
-static const bool isBufferedLine = true;
-static const bool isSendWhileBuffering = false;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
+const uint16_t lineLength = 320;
+const uint16_t lineCount = 240;
+const uint32_t baud  = 2000000; // may be unreliable
+const ProcessFrameData processFrameData = processGrayscaleFrameBuffered;
+const uint16_t bufferLineLength = lineLength;
+const bool isSendWhileBuffering = false;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_YUV422, 6);
 #endif
 
 #if UART_MODE==16
-static const uint16_t lineLength = 640;
-static const uint16_t lineCount = 480;
-static const uint32_t baud  = 2000000;
-static const bool isBufferedLine = false;
-static const bool isSendWhileBuffering = false;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
+const uint16_t lineLength = 640;
+const uint16_t lineCount = 480;
+const uint32_t baud  = 2000000;
+const ProcessFrameData processFrameData = processRgbFrameDirect;
+const uint16_t bufferLineLength = 1;
+const bool isSendWhileBuffering = true;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_RGB565, 39);
 #endif
 
 #if UART_MODE==17
-static const uint16_t lineLength = 640;
-static const uint16_t lineCount = 480;
-static const uint32_t baud  = 2000000;
-static const bool isBufferedLine = false;
-static const bool isSendWhileBuffering = false;
-static const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
+const uint16_t lineLength = 640;
+const uint16_t lineCount = 480;
+const uint32_t baud  = 2000000;
+const ProcessFrameData processFrameData = processGrayscaleFrameDirect;
+const uint16_t bufferLineLength = 1;
+const bool isSendWhileBuffering = true;
+const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_GRAYSCALE;
 CameraOV7670 camera(CameraOV7670::RESOLUTION_VGA_640x480, CameraOV7670::PIXEL_YUV422, 19);
 #endif
 
 
-
-
-uint8_t lineBuffer [isBufferedLine ? lineLength * 2 : 1]; // Two bytes per pixel
+uint8_t lineBuffer [bufferLineLength]; // Two bytes per pixel
 uint8_t * lineBufferSendByte;
 bool isLineBufferSendHighByte;
 bool isLineBufferByteFormatted;
@@ -246,10 +268,6 @@ uint16_t processedByteCountDuringCameraRead = 0;
 
 
 void sendBlankFrame(uint16_t color);
-void processGrayscaleFrameBuffered();
-void processGrayscaleFrameDirect();
-void processRgbFrameBuffered();
-void processRgbFrameDirect();
 inline void startNewFrame(uint8_t pixelFormat) __attribute__((always_inline));
 inline void endOfLine(void) __attribute__((always_inline));
 inline void processNextGrayscalePixelByteInBuffer() __attribute__((always_inline));
@@ -258,7 +276,8 @@ inline void tryToSendNextRgbPixelByteInBuffer() __attribute__((always_inline));
 inline void formatNextRgbPixelByteInBuffer() __attribute__((always_inline));
 inline uint8_t formatRgbPixelByteH(uint8_t byte) __attribute__((always_inline));
 inline uint8_t formatRgbPixelByteL(uint8_t byte) __attribute__((always_inline));
-inline uint8_t formatPixelByteGrayscale(uint8_t byte) __attribute__((always_inline));
+inline uint8_t formatPixelByteGrayscaleFirst(uint8_t byte) __attribute__((always_inline));
+inline uint8_t formatPixelByteGrayscaleSecond(uint8_t byte) __attribute__((always_inline));
 inline void waitForPreviousUartByteToBeSent() __attribute__((always_inline));
 inline bool isUartReady() __attribute__((always_inline));
 
@@ -308,22 +327,7 @@ void processFrame() {
   processedByteCountDuringCameraRead = 0;
   startNewFrame(uartPixelFormat);
   noInterrupts();
-    
-  if (uartPixelFormat == UART_PIXEL_FORMAT_GRAYSCALE) {
-    if (isBufferedLine) {
-      processGrayscaleFrameBuffered();
-    } else {
-      processGrayscaleFrameDirect();
-    }
-  } else {
-    if (isBufferedLine) {
-      processRgbFrameBuffered();
-    } else {
-      processRgbFrameDirect();
-    }
-    
-  }
-
+  processFrameData();
   interrupts();
   frameCounter++;
   debugPrint("Frame " + String(frameCounter) + " " + String(processedByteCountDuringCameraRead));
@@ -338,11 +342,22 @@ void processGrayscaleFrameBuffered() {
   for (uint16_t y = 0; y < lineCount; y++) {
     lineBufferSendByte = &lineBuffer[0];
     camera.ignoreHorizontalPaddingLeft();
+    isLineBufferSendHighByte = true;
 
     for (uint16_t x = 0; x < lineLength; x++) {
       camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
       camera.readPixelByte(lineBuffer[x]);
-      lineBuffer[x] = formatPixelByteGrayscale(lineBuffer[x]);
+      lineBuffer[x] = formatPixelByteGrayscaleFirst(lineBuffer[x]);
+
+      camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
+      if (isSendWhileBuffering) {
+        processNextGrayscalePixelByteInBuffer();
+      }
+
+      x++;
+      camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
+      camera.readPixelByte(lineBuffer[x]);
+      lineBuffer[x] = formatPixelByteGrayscaleSecond(lineBuffer[x]);
 
       camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
       if (isSendWhileBuffering) {
@@ -371,7 +386,6 @@ void processNextGrayscalePixelByteInBuffer() {
 }
 
 
-
 void processGrayscaleFrameDirect() {
   camera.waitForVsync();
   camera.ignoreVerticalPadding();
@@ -379,10 +393,18 @@ void processGrayscaleFrameDirect() {
   for (uint16_t y = 0; y < lineCount; y++) {
     camera.ignoreHorizontalPaddingLeft();
 
-    for (uint16_t x = 0; x < lineLength; x++) {
+    for (uint16_t x = 0; x < lineLength / 2; x++) {
       camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
       camera.readPixelByte(lineBuffer[0]);
-      lineBuffer[0] = formatPixelByteGrayscale(lineBuffer[0]);
+      lineBuffer[0] = formatPixelByteGrayscaleFirst(lineBuffer[0]);
+      
+      camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
+      waitForPreviousUartByteToBeSent();
+      UDR0 = lineBuffer[0];
+
+      camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
+      camera.readPixelByte(lineBuffer[0]);
+      lineBuffer[0] = formatPixelByteGrayscaleSecond(lineBuffer[0]);
       
       camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
       waitForPreviousUartByteToBeSent();
@@ -394,10 +416,19 @@ void processGrayscaleFrameDirect() {
   }
 }
 
-uint8_t formatPixelByteGrayscale(uint8_t pixelByte) {
-  return pixelByte | 0b00000001; // make pixel color always slightly above 0 since zero is end of line marker
+uint8_t formatPixelByteGrayscaleFirst(uint8_t pixelByte) {  
+  // Make pixel color always slightly above 0 since zero is end of line marker
+  pixelByte &= 0b11111110;
+  if (pixelByte == 0) {
+    pixelByte |= 0b00000010;
+  }
+  return pixelByte;
 }
 
+uint8_t formatPixelByteGrayscaleSecond(uint8_t pixelByte) {
+   // Make pixel color always slightly above 0 since zero is end of line marker
+  return pixelByte | 0b00000001;
+}
 
 
 
