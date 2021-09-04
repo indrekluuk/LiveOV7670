@@ -417,16 +417,17 @@ void processGrayscaleFrameDirect() {
 }
 
 uint8_t formatPixelByteGrayscaleFirst(uint8_t pixelByte) {  
-  // Make pixel color always slightly above 0 since zero is end of line marker
+  // For the First byte in the parity chek byte pair the last bit is always 0.
   pixelByte &= 0b11111110;
   if (pixelByte == 0) {
+    // Make pixel color always slightly above 0 since zero is a command marker.
     pixelByte |= 0b00000010;
   }
   return pixelByte;
 }
 
 uint8_t formatPixelByteGrayscaleSecond(uint8_t pixelByte) {
-   // Make pixel color always slightly above 0 since zero is end of line marker
+   // For the second byte in the parity chek byte pair the last bit is always 1.
   return pixelByte | 0b00000001;
 }
 
