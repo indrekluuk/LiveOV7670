@@ -443,7 +443,7 @@ void processRgbFrameBuffered() {
 
     camera.ignoreHorizontalPaddingLeft();
 
-    for (uint16_t x = 0; x < lineLength * 2;  x++) {
+    for (uint16_t x = 0; x < lineBufferLength;  x++) {
       camera.waitForPixelClockRisingEdge();
       camera.readPixelByte(lineBuffer[x]);
       if (isSendWhileBuffering) {
