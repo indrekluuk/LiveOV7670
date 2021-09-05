@@ -32,10 +32,9 @@
 
 
 
-const uint8_t VERSION = 0x00;
+const uint8_t VERSION = 0x10;
 const uint8_t COMMAND_NEW_FRAME = 0x01 | VERSION;
-const uint8_t COMMAND_END_OF_LINE = 0x02;
-const uint8_t COMMAND_DEBUG_DATA = 0x03;
+const uint8_t COMMAND_DEBUG_DATA = 0x03 | VERSION;
 
 // Lower three bits 0b00000111.
 // Upper bits reserved for future attributes.
@@ -269,7 +268,6 @@ uint16_t processedByteCountDuringCameraRead = 0;
 
 void sendBlankFrame(uint16_t color);
 inline void startNewFrame(uint8_t pixelFormat) __attribute__((always_inline));
-inline void endOfLine(void) __attribute__((always_inline));
 inline void processNextGrayscalePixelByteInBuffer() __attribute__((always_inline));
 inline void processNextRgbPixelByteInBuffer() __attribute__((always_inline));
 inline void tryToSendNextRgbPixelByteInBuffer() __attribute__((always_inline));
@@ -315,7 +313,6 @@ void sendBlankFrame(uint16_t color) {
       waitForPreviousUartByteToBeSent();
       UDR0 = formatRgbPixelByteL(colorL);
     }
-    endOfLine();
   }
 }
 
@@ -374,8 +371,6 @@ void processGrayscaleFrameBuffered() {
     while (lineBufferSendByte < &lineBuffer[lineLength]) {
       processNextGrayscalePixelByteInBuffer();
     }
- 
-    endOfLine();
   };
 }
 
@@ -408,7 +403,7 @@ void processGrayscaleFrameDirect() {
       camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
       camera.readPixelByte(lineBuffer[0]);
       lineBuffer[0] = formatPixelByteGrayscaleSecond(lineBuffer[0]);
-      
+
       camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
       waitForPreviousUartByteToBeSent();
       UDR0 = lineBuffer[0];
@@ -416,7 +411,6 @@ void processGrayscaleFrameDirect() {
     }
 
     camera.ignoreHorizontalPaddingRight();
-    endOfLine();
   }
 }
 
@@ -465,8 +459,6 @@ void processRgbFrameBuffered() {
     while (lineBufferSendByte < &lineBuffer[lineLength * 2]) {
       processNextRgbPixelByteInBuffer();
     }
-
-    endOfLine();
   }
 }
 
@@ -524,7 +516,6 @@ void processRgbFrameDirect() {
     }
     
     camera.ignoreHorizontalPaddingRight();
-    endOfLine();
   };
 }
 
@@ -568,6 +559,9 @@ void startNewFrame(uint8_t pixelFormat) {
   waitForPreviousUartByteToBeSent();
   UDR0 = COMMAND_NEW_FRAME;
 
+  waitForPreviousUartByteToBeSent();
+  UDR0 = 5; // commnd length
+
   // frame width
   waitForPreviousUartByteToBeSent();
   UDR0 = (lineLength >> 8) & 0xFF;
@@ -583,15 +577,6 @@ void startNewFrame(uint8_t pixelFormat) {
   // pixel format
   waitForPreviousUartByteToBeSent();
   UDR0 = (pixelFormat);
-}
-
-
-
-void endOfLine()   {
-  waitForPreviousUartByteToBeSent();
-  UDR0 = 0x00;
-  waitForPreviousUartByteToBeSent();
-  UDR0 = COMMAND_END_OF_LINE;
 }
 
 
