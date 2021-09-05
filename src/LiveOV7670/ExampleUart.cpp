@@ -36,11 +36,8 @@ const uint8_t VERSION = 0x10;
 const uint8_t COMMAND_NEW_FRAME = 0x01 | VERSION;
 const uint8_t COMMAND_DEBUG_DATA = 0x03 | VERSION;
 
-// Lower three bits 0b00000111.
-// Upper bits reserved for future attributes.
-const uint16_t UART_PIXEL_BYTE_PARITY_CHECK = 0x80;
-const uint16_t UART_PIXEL_FORMAT_RGB565 = 0x01 | UART_PIXEL_BYTE_PARITY_CHECK; // Signal to ArduImageCapture that parity check is enabled
-const uint16_t UART_PIXEL_FORMAT_GRAYSCALE = 0x02 | UART_PIXEL_BYTE_PARITY_CHECK; // Signal to ArduImageCapture that parity check is enabled;
+const uint16_t UART_PIXEL_FORMAT_RGB565 = 0x01;
+const uint16_t UART_PIXEL_FORMAT_GRAYSCALE = 0x02;
 
 // Pixel byte parity check:
 // Pixel Byte H: odd number of bits under H_BYTE_PARITY_CHECK and H_BYTE_PARITY_INVERT
@@ -265,9 +262,11 @@ uint16_t frameCounter = 0;
 uint16_t processedByteCountDuringCameraRead = 0;
 
 
+void commandStartNewFrame(uint8_t pixelFormat);
+void commandDebugPrint(const String debugText);
+uint8_t sendNextCommandByte(uint8_t checksum, uint8_t commandByte);
 
 void sendBlankFrame(uint16_t color);
-inline void startNewFrame(uint8_t pixelFormat) __attribute__((always_inline));
 inline void processNextGrayscalePixelByteInBuffer() __attribute__((always_inline));
 inline void processNextRgbPixelByteInBuffer() __attribute__((always_inline));
 inline void tryToSendNextRgbPixelByteInBuffer() __attribute__((always_inline));
@@ -279,7 +278,6 @@ inline uint8_t formatPixelByteGrayscaleSecond(uint8_t byte) __attribute__((alway
 inline void waitForPreviousUartByteToBeSent() __attribute__((always_inline));
 inline bool isUartReady() __attribute__((always_inline));
 
-inline void debugPrint(const String debugText) __attribute__((always_inline));
 
 
 // this is called in Arduino setup() function
@@ -305,7 +303,7 @@ void sendBlankFrame(uint16_t color) {
   uint8_t colorH = (color >> 8) & 0xFF;
   uint8_t colorL = color & 0xFF;
 
-  startNewFrame(UART_PIXEL_FORMAT_RGB565);
+  commandStartNewFrame(UART_PIXEL_FORMAT_RGB565);
   for (uint16_t j=0; j<lineCount; j++) {
     for (uint16_t i=0; i<lineLength; i++) {
       waitForPreviousUartByteToBeSent();
@@ -322,13 +320,13 @@ void sendBlankFrame(uint16_t color) {
 // this is called in Arduino loop() function
 void processFrame() {
   processedByteCountDuringCameraRead = 0;
-  startNewFrame(uartPixelFormat);
+  commandStartNewFrame(uartPixelFormat);
   noInterrupts();
   processFrameData();
   interrupts();
   frameCounter++;
-  debugPrint("Frame " + String(frameCounter) + " " + String(processedByteCountDuringCameraRead));
-  //debugPrint("Frame " + String(frameCounter, 16)); // send number in hexadecimal
+  commandDebugPrint("Frame " + String(frameCounter)/* + " " + String(processedByteCountDuringCameraRead)*/);
+  //commandDebugPrint("Frame " + String(frameCounter, 16)); // send number in hexadecimal
 }
 
 
@@ -553,46 +551,54 @@ uint8_t formatRgbPixelByteL(uint8_t pixelByteL) {
 
 
 
-void startNewFrame(uint8_t pixelFormat) {
+void commandStartNewFrame(uint8_t pixelFormat) {
   waitForPreviousUartByteToBeSent();
-  UDR0 = 0x00;
-  waitForPreviousUartByteToBeSent();
-  UDR0 = COMMAND_NEW_FRAME;
+  UDR0 = 0x00; // New command
 
   waitForPreviousUartByteToBeSent();
-  UDR0 = 5; // commnd length
+  UDR0 = 4; // Command length
 
-  // frame width
-  waitForPreviousUartByteToBeSent();
-  UDR0 = (lineLength >> 8) & 0xFF;
-  waitForPreviousUartByteToBeSent();
-  UDR0 = lineLength & 0xFF;
+  uint8_t checksum = 0;
+  checksum = sendNextCommandByte(checksum, COMMAND_NEW_FRAME);
+  checksum = sendNextCommandByte(checksum, lineLength & 0xFF); // lower 8 bits of image width
+  checksum = sendNextCommandByte(checksum, lineCount & 0xFF); // lower 8 bits of image height
+  checksum = sendNextCommandByte(checksum, 
+      ((lineLength >> 8) & 0x03) // higher 2 bits of image width
+      | ((lineCount >> 6) & 0x0C) // higher 2 bits of image height
+      | ((pixelFormat << 4) & 0xF0));
 
-  // frame height
   waitForPreviousUartByteToBeSent();
-  UDR0 = (lineCount >> 8) & 0xFF;
-  waitForPreviousUartByteToBeSent();
-  UDR0 = lineCount & 0xFF;
-
-  // pixel format
-  waitForPreviousUartByteToBeSent();
-  UDR0 = (pixelFormat);
+  UDR0 = checksum;
 }
 
 
+void commandDebugPrint(const String debugText) {
+  if (debugText.length() > 0) {
+    
+    waitForPreviousUartByteToBeSent();
+    UDR0 = 0x00; // New commnad
 
-void debugPrint(const String debugText) {
     waitForPreviousUartByteToBeSent();
-    UDR0 = 0x00;
-    waitForPreviousUartByteToBeSent();
-    UDR0 = COMMAND_DEBUG_DATA;
-    waitForPreviousUartByteToBeSent();
-    UDR0 = debugText.length();
+    UDR0 = debugText.length() + 1; // Command length. +1 for command code.
+    
+    uint8_t checksum = 0;
+    checksum = sendNextCommandByte(checksum, COMMAND_DEBUG_DATA);
     for (uint16_t i=0; i<debugText.length(); i++) {
-        waitForPreviousUartByteToBeSent();
-        UDR0 = debugText[i];
+      checksum = sendNextCommandByte(checksum, debugText[i]);
     }
+
+    waitForPreviousUartByteToBeSent();
+    UDR0 = checksum;
+  }
 }
+
+
+uint8_t sendNextCommandByte(uint8_t checksum, uint8_t commandByte) {
+  waitForPreviousUartByteToBeSent();
+  UDR0 = commandByte;
+  return checksum ^ commandByte;
+}
+
 
 
 
