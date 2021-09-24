@@ -216,7 +216,7 @@ const ProcessFrameData processFrameData = processRgbFrameBuffered;
 const uint16_t lineBufferLength = lineLength * 2;
 const bool isSendWhileBuffering = true;
 const uint8_t uartPixelFormat = UART_PIXEL_FORMAT_RGB565;
-CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_RGB565, 11);
+CameraOV7670 camera(CameraOV7670::RESOLUTION_QVGA_320x240, CameraOV7670::PIXEL_RGB565, 12);
 #endif
 
 #if UART_MODE==15
@@ -332,6 +332,8 @@ void processFrame() {
 
 void processGrayscaleFrameBuffered() {
   camera.waitForVsync();
+  commandDebugPrint("Vsync");
+
   camera.ignoreVerticalPadding();
 
   for (uint16_t y = 0; y < lineCount; y++) {
@@ -342,8 +344,8 @@ void processGrayscaleFrameBuffered() {
     while ( x < lineBufferLength) {
       camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
       camera.readPixelByte(lineBuffer[x]);
-      lineBuffer[x] = formatPixelByteGrayscaleFirst(lineBuffer[x]);  
-      
+      lineBuffer[x] = formatPixelByteGrayscaleFirst(lineBuffer[x]);
+
       camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
       if (isSendWhileBuffering) {
         processNextGrayscalePixelByteInBuffer();
@@ -353,7 +355,7 @@ void processGrayscaleFrameBuffered() {
       camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
       camera.readPixelByte(lineBuffer[x]);
       lineBuffer[x] = formatPixelByteGrayscaleSecond(lineBuffer[x]);
-      
+
       camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
       if (isSendWhileBuffering) {
         processNextGrayscalePixelByteInBuffer();
@@ -375,15 +377,17 @@ void processGrayscaleFrameBuffered() {
 void processNextGrayscalePixelByteInBuffer() {
   if (isUartReady()) {
     UDR0 = *lineBufferSendByte;
-    lineBufferSendByte++;        
+    lineBufferSendByte++;
   }
 }
 
 
 void processGrayscaleFrameDirect() {
   camera.waitForVsync();
+  commandDebugPrint("Vsync");
+
   camera.ignoreVerticalPadding();
-  
+
   for (uint16_t y = 0; y < lineCount; y++) {
     camera.ignoreHorizontalPaddingLeft();
 
@@ -392,7 +396,7 @@ void processGrayscaleFrameDirect() {
       camera.waitForPixelClockRisingEdge(); // YUV422 grayscale byte
       camera.readPixelByte(lineBuffer[0]);
       lineBuffer[0] = formatPixelByteGrayscaleFirst(lineBuffer[0]);
-      
+
       camera.waitForPixelClockRisingEdge(); // YUV422 color byte. Ignore.
       waitForPreviousUartByteToBeSent();
       UDR0 = lineBuffer[0];
@@ -412,7 +416,7 @@ void processGrayscaleFrameDirect() {
   }
 }
 
-uint8_t formatPixelByteGrayscaleFirst(uint8_t pixelByte) {  
+uint8_t formatPixelByteGrayscaleFirst(uint8_t pixelByte) {
   // For the First byte in the parity chek byte pair the last bit is always 0.
   pixelByte &= 0b11111110;
   if (pixelByte == 0) {
@@ -423,7 +427,7 @@ uint8_t formatPixelByteGrayscaleFirst(uint8_t pixelByte) {
 }
 
 uint8_t formatPixelByteGrayscaleSecond(uint8_t pixelByte) {
-   // For the second byte in the parity chek byte pair the last bit is always 1.
+  // For the second byte in the parity chek byte pair the last bit is always 1.
   return pixelByte | 0b00000001;
 }
 
@@ -431,8 +435,10 @@ uint8_t formatPixelByteGrayscaleSecond(uint8_t pixelByte) {
 
 void processRgbFrameBuffered() {
   camera.waitForVsync();
+  commandDebugPrint("Vsync");
+
   camera.ignoreVerticalPadding();
-  
+
   for (uint16_t y = 0; y < lineCount; y++) {
     lineBufferSendByte = &lineBuffer[0];
     isLineBufferSendHighByte = true; // Line starts with High byte
@@ -467,14 +473,14 @@ void processNextRgbPixelByteInBuffer() {
     tryToSendNextRgbPixelByteInBuffer();
   } else {
     formatNextRgbPixelByteInBuffer();
-  }        
+  }
 }
 
 void tryToSendNextRgbPixelByteInBuffer() {
   if (isUartReady()) {
     UDR0 = *lineBufferSendByte;
-    lineBufferSendByte++;    
-    isLineBufferByteFormatted = false;    
+    lineBufferSendByte++;
+    isLineBufferByteFormatted = false;
   }
 }
 
@@ -493,6 +499,8 @@ void formatNextRgbPixelByteInBuffer() {
 
 void processRgbFrameDirect() {
   camera.waitForVsync();
+  commandDebugPrint("Vsync");
+
   camera.ignoreVerticalPadding();
 
   for (uint16_t y = 0; y < lineCount; y++) {
