@@ -22,7 +22,7 @@
  *  EXAMPLE = 3
  *  Reads data from LiveOV7670Library and send it over UART to computer
  *  Java application for receiving picture from UART
- *  https://github.com/indrekluuk/ArduinoImageCapture
+ *  https://github.com/indrekluuk/ArduImageCapture
  *
  *  EXAMPLE = 4
  *  Gray scale image @20Hz. Interlaced image.
